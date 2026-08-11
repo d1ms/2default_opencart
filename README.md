@@ -26,22 +26,15 @@
 
 ### Installation Guide
 
-#### Method 1: Automatic Installer (.ocmod.zip)
-1. Archive `install.xml`, `install.php`, and the `upload/` folder together into a file named `2default.ocmod.zip`.
+1. **Download the ZIP Archive**: Click the green **Code** button at the top right of this GitHub repository page and select **Download ZIP**.
 2. Log into your OpenCart Admin panel.
 3. Navigate to **Extensions > Extension Installer** (**Дополнения > Установка дополнений**).
-4. Click **Upload** and select `2default.ocmod.zip`.
+4. Click **Upload** and select the downloaded `.zip` file.
 5. Navigate to **Extensions > Modifications** (**Дополнения > Менеджер дополнений**) and click the blue **Refresh** button in the top right.
 6. Navigate to **Extensions > Themes**, edit **2Default Store Theme**:
    - Set status to **Enabled**.
    - Customize your theme colors under the **Colors** tab.
 7. Go to **System > Settings**, edit your store, and set the **Theme** to `2Default Store Theme`.
-
-#### Method 2: Manual Installation
-1. Upload the contents of the `upload/` folder directly to your store's root directory.
-2. In OpenCart Admin, go to **Extensions > Extension Installer** and upload `install.xml`.
-3. Click **Refresh** in **Extensions > Modifications**.
-4. Enable the theme in **Extensions > Themes** and **System > Settings**.
 
 ---
 
@@ -63,22 +56,15 @@
 
 ### Инструкция по установке
 
-#### Способ 1: Автоматическая установка (.ocmod.zip)
-1. Упакуйте файлы `install.xml`, `install.php` и папку `upload/` в zip-архив с именем `2default.ocmod.zip`.
+1. **Скачайте ZIP-архив**: Нажмите зеленую кнопку **Code** в верхней правой части этой страницы репозитория GitHub и выберите **Download ZIP**.
 2. Зайдите в панель управления OpenCart.
 3. Перейдите в раздел **Дополнения > Установка дополнений** (**Extensions > Extension Installer**).
-4. Нажмите кнопку **Загрузить** и выберите созданный архив `2default.ocmod.zip`.
+4. Нажмите кнопку **Загрузить** и выберите скачанный `.zip` архив.
 5. Перейдите в **Дополнения > Менеджер дополнений** (**Extensions > Modifications**) и нажмите синюю кнопку **Обновить** в правом верхнем углу.
 6. Перейдите в **Дополнения > Шаблоны**, откройте **2Default Store Theme**:
    - Установите статус **Включено**.
    - Настройте свои палитры во вкладке **Цвета**.
 7. Перейдите в **Система > Настройки**, откройте настройки магазина и выберите шаблон `2Default Store Theme`.
-
-#### Способ 2: Ручная установка
-1. Скопируйте содержимое папки `upload/` в корневую директорию вашего сайта на OpenCart.
-2. В админ-панели перейдите в **Дополнения > Установка дополнений** и загрузите файл `install.xml`.
-3. Нажмите кнопку **Обновить** в **Дополнения > Менеджер дополнений**.
-4. Включите шаблон в **Дополнения > Шаблоны** и выберите его в **Система > Настройки**.
 
 ---
 
