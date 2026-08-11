@@ -3,9 +3,9 @@
 [![OpenCart Version](https://img.shields.io/badge/OpenCart-3.0%2B-blue.svg)](https://www.opencart.com/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)](LICENSE)
 [![Design](https://img.shields.io/badge/Design-Glassmorphism%20%26%20Tailwind-06b6d4.svg)](#features--возможности)
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg?style=for-the-badge)](demo/index.html)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg?style=for-the-badge)](https://d1ms.github.io/2default_opencart/demo/)
 
-**[English](#english)** | **[Русский](#русский)**
+**[Live Demo / Демо-версия](https://d1ms.github.io/2default_opencart/demo/)** | **[English](#english)** | **[Русский](#русский)**
 
 ---
 
@@ -14,6 +14,8 @@
 
 ### Description
 **2Default** is a state-of-the-art, high-performance, mobile-first theme designed specifically for OpenCart 3. It replaces OpenCart's aging stock default interface with a stunning modern aesthetic featuring glassmorphism, dynamic color customization via CSS variables, crisp Lucide SVG icons, interactive Promo (Hero) blocks, a sliding AJAX cart drawer, and fully optimized account & checkout layouts.
+
+🌐 **Live Demo**: [https://d1ms.github.io/2default_opencart/demo/](https://d1ms.github.io/2default_opencart/demo/)
 
 ### Key Features
 * 🎨 **Dynamic Admin Color Management**: Adjust brand colors (Primary, Accent, Surfaces, Header Background, Borders, Text) directly from **Extensions > Themes > 2Default** using interactive color pickers.
@@ -44,6 +46,8 @@
 
 ### Описание
 **2Default** — это современный, высокопроизводительный и адаптивный шаблон нового поколения для OpenCart 3. Он полностью преображает стандартный устаревший интерфейс OpenCart, предлагая элегантный стеклянный стиль (Glassmorphism), динамическое управление цветами через CSS-переменные из админ-панели, чистые векторные иконки Lucide SVG, управляемые Промо-блоки (Hero-модуль), всплывающую AJAX-корзину и стилизованный личный кабинет.
+
+🌐 **Живая демо-версия**: [https://d1ms.github.io/2default_opencart/demo/](https://d1ms.github.io/2default_opencart/demo/)
 
 ### Ключевые возможности
 * 🎨 **Управление цветами из админки**: Настраивайте фирменные цвета (основной, акцентный, фоны страниц, фон шапки, границы, текст) прямо в **Дополнения > Шаблоны > 2Default** с помощью удобных палитр.
