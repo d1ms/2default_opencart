@@ -1,0 +1,88 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="account-reward" class="container-app py-8 md:py-12">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-ink flex items-center gap-2.5">
+          {{ ic.icon('star', 'w-7 h-7 text-accent') }} {{ heading_title }}
+        </h1>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-accent/10 border border-accent/20">
+          <span class="text-xs text-ink-2 font-medium">{{ text_total }}</span>
+          <span class="font-headline font-bold text-sm text-accent">{{ total }}</span>
+        </div>
+      </div>
+
+      {% if rewards %}
+      <div class="bg-white rounded-2xl border border-border/40 overflow-hidden shadow-2xs">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-border/40 bg-surface-2/60">
+                <th class="py-3.5 px-4 font-headline text-xs font-bold uppercase tracking-wider text-ink-2">{{ column_date_added }}</th>
+                <th class="py-3.5 px-4 font-headline text-xs font-bold uppercase tracking-wider text-ink-2">{{ column_description }}</th>
+                <th class="py-3.5 px-4 font-headline text-xs font-bold uppercase tracking-wider text-ink-2 text-right">{{ column_points }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border/30">
+              {% for reward in rewards %}
+              <tr class="hover:bg-surface-2/40 transition-colors">
+                <td class="py-3.5 px-4 text-xs text-ink-3 whitespace-nowrap">{{ reward.date_added }}</td>
+                <td class="py-3.5 px-4 text-sm text-ink font-medium">
+                  {% if reward.order_id %}
+                  <a href="{{ reward.href }}" class="text-primary hover:underline">{{ reward.description }}</a>
+                  {% else %}
+                  {{ reward.description }}
+                  {% endif %}
+                </td>
+                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-accent/10 text-accent font-headline">
+                    +{{ reward.points }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 text-xs text-ink-3">
+        <div>{{ pagination }}</div>
+        <div>{{ results }}</div>
+      </div>
+      {% else %}
+      <div class="text-center py-16 px-6 bg-white rounded-2xl border border-border/40 space-y-3 shadow-2xs">
+        <div class="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center mx-auto text-ink-3">
+          {{ ic.icon('star', 'w-6 h-6 text-accent') }}
+        </div>
+        <p class="text-sm text-ink-2 font-medium">{{ text_empty }}</p>
+      </div>
+      {% endif %}
+
+      <div class="flex justify-end mt-6">
+        <a href="{{ continue }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-sm transition-all no-underline">
+          {{ button_continue }} {{ ic.icon('arrow-right', 'w-4 h-4') }}
+        </a>
+      </div>
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

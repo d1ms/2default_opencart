@@ -1,0 +1,143 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="checkout-cart" class="container-app py-8 md:py-12">
+
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}" class="text-ink-3 hover:text-primary no-underline">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+
+  {% if attention %}
+  <div class="alert alert-info">{{ ic.icon('info', 'w-4 h-4 inline -mt-0.5') }} {{ attention }}<button type="button" class="close" data-dismiss="alert">&times;</button></div>
+  {% endif %}
+  {% if success %}
+  <div class="alert alert-success alert-dismissible">{{ ic.icon('check-circle', 'w-4 h-4 inline -mt-0.5') }} {{ success }}<button type="button" class="close" data-dismiss="alert">&times;</button></div>
+  {% endif %}
+  {% if error_warning %}
+  <div class="alert alert-danger alert-dismissible">{{ ic.icon('alert-circle', 'w-4 h-4 inline -mt-0.5') }} {{ error_warning }}<button type="button" class="close" data-dismiss="alert">&times;</button></div>
+  {% endif %}
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+
+      <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-ink mb-6">{{ heading_title }}{% if weight %} <span class="text-base font-normal text-ink-3">({{ weight }})</span>{% endif %}</h1>
+
+      {% if products or vouchers %}
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div class="lg:col-span-2 min-w-0">
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" class="space-y-3">
+            {% for product in products %}
+            <div class="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto_auto] gap-x-4 gap-y-3 items-center p-4 rounded-2xl bg-white border border-border/40">
+              {% if product.thumb %}
+              <a href="{{ product.href }}" class="shrink-0 row-span-2 sm:row-span-1"><img src="{{ product.thumb }}" alt="{{ product.name }}" class="w-20 h-20 object-contain rounded-xl bg-surface-2 p-1"></a>
+              {% endif %}
+              <div class="min-w-0">
+                <a href="{{ product.href }}" class="font-headline font-semibold text-sm text-ink hover:text-primary no-underline">{{ product.name }}</a>
+                {% if not product.stock %}
+                <span class="inline-flex items-center gap-1 align-middle ml-1.5 px-1.5 py-0.5 rounded-full bg-danger-soft text-danger text-[0.7rem] font-semibold" title="{{ error_stock }}" aria-label="{{ error_stock }}">{{ ic.icon('alert-circle', 'w-3 h-3') }} ***</span>
+                {% endif %}
+                <div class="text-xs text-ink-3 mt-0.5">{{ product.model }}</div>
+                {% if product.option %}
+                {% for option in product.option %}
+                <div class="text-xs text-ink-3">{{ option.name }}: {{ option.value }}</div>
+                {% endfor %}
+                {% endif %}
+                {% if product.reward %}<div class="text-xs text-ink-3">{{ product.reward }}</div>{% endif %}
+                {% if product.recurring %}<div class="text-xs mt-1"><span class="label label-info">{{ text_recurring_item }}</span> {{ product.recurring }}</div>{% endif %}
+              </div>
+
+              <div class="flex items-center justify-start sm:justify-center gap-2 col-span-2 sm:col-span-1">
+                <div class="flex items-center gap-2 bg-white px-2 py-1 rounded-full border border-border">
+                  {% if product.quantity > 1 %}
+                  <button type="button" onclick="cart.update('{{ product.cart_id }}', {{ product.quantity - 1 }});" title="{{ text_remove_one|default('-') }}" aria-label="{{ text_remove_one|default('-') }}" class="w-7 h-7 rounded-full text-ink-2 hover:bg-surface-3 flex items-center justify-center">
+                    {{ ic.icon('minus', 'w-3.5 h-3.5') }}
+                  </button>
+                  {% else %}
+                  <button type="button" onclick="cart.remove('{{ product.cart_id }}');" title="{{ button_remove }}" aria-label="{{ button_remove }}" class="w-7 h-7 rounded-full text-ink-2 hover:bg-surface-3 flex items-center justify-center">
+                    {{ ic.icon('minus', 'w-3.5 h-3.5') }}
+                  </button>
+                  {% endif %}
+                  <span class="text-sm font-extrabold text-ink min-w-4 text-center">{{ product.quantity }}</span>
+                  <button type="button" onclick="cart.update('{{ product.cart_id }}', {{ product.quantity + 1 }});" title="{{ text_add_one|default('+') }}" aria-label="{{ text_add_one|default('+') }}" class="w-7 h-7 rounded-full text-accent hover:bg-accent/10 flex items-center justify-center">
+                    {{ ic.icon('plus', 'w-3.5 h-3.5') }}
+                  </button>
+                </div>
+                <button type="button" title="{{ button_remove }}" aria-label="{{ button_remove }}" onclick="cart.remove('{{ product.cart_id }}');" class="text-ink-3 hover:text-danger p-1.5 rounded-full hover:bg-danger-soft/60 transition-colors">
+                  {{ ic.icon('trash', 'w-4 h-4') }}
+                </button>
+              </div>
+
+              <div class="text-right shrink-0 col-span-2 sm:col-span-1 w-full sm:w-28">
+                <div class="text-xs text-ink-3">{{ product.price }}</div>
+                <div class="font-headline font-bold text-sm text-primary">{{ product.total }}</div>
+              </div>
+            </div>
+            {% endfor %}
+
+            {% for voucher in vouchers %}
+            <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border/40">
+              <div class="flex-1 text-sm text-ink">{{ voucher.description }}</div>
+              <button type="button" title="{{ button_remove }}" aria-label="{{ button_remove }}" onclick="voucher.remove('{{ voucher.key }}');" class="text-ink-3 hover:text-danger p-1.5 rounded-full hover:bg-danger-soft/60 transition-colors">{{ ic.icon('trash', 'w-4 h-4') }}</button>
+              <div class="font-headline font-bold text-sm text-primary w-24 text-right">{{ voucher.amount }}</div>
+            </div>
+            {% endfor %}
+          </form>
+
+          {% if modules %}
+          <h2 class="font-headline text-lg font-bold text-ink mt-10 mb-1">{{ text_next }}</h2>
+          <p class="text-sm text-ink-3 mb-4">{{ text_next_choice }}</p>
+          <div class="panel-group" id="accordion">
+            {% for module in modules %}
+            {{ module }}
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="lg:sticky lg:top-24">
+          <div class="bg-white rounded-2xl border border-border/40 p-5">
+            <div class="space-y-2">
+              {% for total in totals %}
+              <div class="flex items-center justify-between {% if loop.last %}pt-3 mt-1 border-t border-surface-2 text-base{% else %}text-sm{% endif %}">
+                <span class="{% if loop.last %}font-headline font-bold text-ink{% else %}text-ink-2 font-semibold{% endif %}">{{ total.title }}</span>
+                <span class="{% if loop.last %}font-headline font-extrabold text-primary text-lg{% else %}font-bold text-ink{% endif %}">{{ total.text }}</span>
+              </div>
+              {% endfor %}
+            </div>
+
+            <a href="{{ checkout }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-sm transition-all no-underline cursor-pointer w-full text-center mt-5"><span>{{ button_checkout }}</span> {{ ic.icon('arrow-right', 'w-4 h-4') }}</a>
+            <a href="{{ continue }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-surface-2 hover:bg-surface-3 text-ink-2 hover:text-ink font-headline font-bold text-sm border border-border/60 transition-all no-underline cursor-pointer w-full text-center mt-2">{{ ic.icon('arrow-left', 'w-4 h-4') }} <span>{{ button_shopping }}</span></a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="text-center py-16 px-6 bg-white rounded-2xl border border-border/40 space-y-4 max-w-md mx-auto shadow-2xs my-6">
+        <div class="w-16 h-16 rounded-full bg-surface-2 flex items-center justify-center mx-auto text-primary">
+          {{ ic.icon('shopping-bag', 'w-8 h-8') }}
+        </div>
+        <p class="text-base text-ink-2 font-semibold">{{ text_empty|default(text_error|default('Ваша корзина пуста!')) }}</p>
+        <div class="pt-2">
+          <a href="{{ continue }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-md hover:shadow-lg transition-all no-underline">
+            {{ button_shopping|default(button_continue|default('Продолжить')) }} {{ ic.icon('arrow-right', 'w-4 h-4') }}
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

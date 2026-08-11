@@ -1,0 +1,27 @@
+{% import '2default/template/common/icon.twig' as ic %}
+<div class="p-5 mb-6">
+  <div class="flex flex-wrap gap-2.5">
+    {% if not logged %}
+    <a href="{{ login }}" class="account-pill">{{ ic.icon('user', 'w-4 h-4') }} {{ text_login }}</a>
+    <a href="{{ register }}" class="account-pill">{{ ic.icon('pencil', 'w-4 h-4') }} {{ text_register }}</a>
+    <a href="{{ forgotten }}" class="account-pill">{{ ic.icon('info', 'w-4 h-4') }} {{ text_forgotten }}</a>
+    {% endif %}
+    <a href="{{ account }}" class="account-pill">{{ ic.icon('user', 'w-4 h-4') }} {{ text_account }}</a>
+    {% if logged %}
+    <a href="{{ edit }}" class="account-pill">{{ ic.icon('pencil', 'w-4 h-4') }} {{ text_edit }}</a>
+    <a href="{{ password }}" class="account-pill">{{ ic.icon('shield-check', 'w-4 h-4') }} {{ text_password }}</a>
+    {% endif %}
+    <a href="{{ address }}" class="account-pill">{{ ic.icon('map-pin', 'w-4 h-4') }} {{ text_address }}</a>
+    <a href="{{ wishlist }}" class="account-pill">{{ ic.icon('heart', 'w-4 h-4') }} {{ text_wishlist }}</a>
+    <a href="{{ order }}" class="account-pill">{{ ic.icon('file-text', 'w-4 h-4') }} {{ text_order }}</a>
+    <a href="{{ download }}" class="account-pill">{{ ic.icon('download', 'w-4 h-4') }} {{ text_download }}</a>
+    <a href="{{ recurring }}" class="account-pill">{{ ic.icon('clock', 'w-4 h-4') }} {{ text_recurring }}</a>
+    <a href="{{ reward }}" class="account-pill">{{ ic.icon('star', 'w-4 h-4') }} {{ text_reward }}</a>
+    <a href="{{ return }}" class="account-pill">{{ ic.icon('repeat', 'w-4 h-4') }} {{ text_return }}</a>
+    <a href="{{ transaction }}" class="account-pill">{{ ic.icon('history', 'w-4 h-4') }} {{ text_transaction }}</a>
+    <a href="{{ newsletter }}" class="account-pill">{{ ic.icon('mail', 'w-4 h-4') }} {{ text_newsletter }}</a>
+    {% if logged %}
+    <a href="{{ logout }}" class="account-pill account-pill-danger">{{ ic.icon('x-circle', 'w-4 h-4') }} {{ text_logout }}</a>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,41 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="error-not-found" class="container-app py-8 md:py-12">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+      <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-ink mb-6">{{ heading_title }}</h1>
+
+      <div class="text-center py-16 px-6 bg-white rounded-2xl border border-border/40 space-y-4 max-w-md mx-auto shadow-2xs my-6">
+        <div class="w-16 h-16 rounded-full bg-surface-2 flex items-center justify-center mx-auto text-primary">
+          {{ ic.icon('shopping-bag', 'w-8 h-8') }}
+        </div>
+        <p class="text-base text-ink-2 font-semibold">{{ text_error }}</p>
+        <div class="pt-2">
+          <a href="{{ continue }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-md hover:shadow-lg transition-all no-underline">
+            {{ button_continue }} {{ ic.icon('arrow-right', 'w-4 h-4') }}
+          </a>
+        </div>
+      </div>
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

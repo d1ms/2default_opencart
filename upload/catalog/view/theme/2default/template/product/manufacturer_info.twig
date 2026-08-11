@@ -1,0 +1,89 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="product-manufacturer" class="container-app py-6 md:py-12">
+
+  <nav aria-label="Breadcrumb" class="flex text-xs font-semibold text-ink-3 mb-3">
+    <ol class="inline-flex items-center flex-wrap gap-1">
+      {% for breadcrumb in breadcrumbs %}
+      {% if not loop.last %}
+      <li><a href="{{ breadcrumb.href }}" class="text-ink-3 hover:text-primary no-underline">{{ breadcrumb.text }}</a></li>
+      <li><span class="mx-1 text-border">/</span></li>
+      {% else %}
+      <li><span class="text-primary font-bold">{{ breadcrumb.text }}</span></li>
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <h1 class="font-headline text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight mb-8">{{ heading_title }}</h1>
+
+  {% if products %}
+  <div class="product-specify-bar w-full mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="relative shrink-0 md:ml-auto">
+      <select id="product-sorting-box" class="appearance-none font-semibold text-xs md:text-sm text-ink bg-white border border-border rounded-lg pl-4 pr-8 py-2.5 hover:border-primary transition-colors cursor-pointer" onchange="location = this.value;">
+        {% for s in sorts %}
+        {% if s.value == '%s-%s'|format(sort, order) %}
+        <option value="{{ s.href }}" selected="selected">{{ s.text }}</option>
+        {% else %}
+        <option value="{{ s.href }}">{{ s.text }}</option>
+        {% endif %}
+        {% endfor %}
+      </select>
+      {{ ic.icon('chevron-down', 'w-3.5 h-3.5 text-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none') }}
+    </div>
+  </div>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for product in products %}
+        {% include '2default/template/common/product_thumb.twig' with {'product': product} %}
+        {% endfor %}
+      </div>
+
+      <div class="mt-14 flex items-center justify-between flex-wrap gap-4">
+        <span class="text-xs text-ink-3">{{ results }}</span>
+        <div class="pagination-app">{{ pagination|raw }}</div>
+      </div>
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+  {% else %}
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+
+      <div class="text-center py-20 bg-white rounded-2xl border border-border/40 p-8 space-y-4">
+        <p class="text-sm text-ink-2">{{ text_empty }}</p>
+        <a href="{{ continue }}" class="inline-block px-5 py-2.5 bg-accent hover:bg-primary text-white rounded-lg text-xs font-bold no-underline">{{ button_continue }}</a>
+      </div>
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+  {% endif %}
+</div>
+{{ footer }}

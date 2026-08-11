@@ -1,0 +1,63 @@
+<footer class="w-full mt-auto bg-surface-2 border-t border-border/60">
+  <div class="container-app grid grid-cols-1 md:grid-cols-4 gap-8 py-12 md:py-16 text-xs md:text-sm text-primary">
+
+    <div class="flex flex-col gap-4">
+      <div class="font-headline text-2xl font-bold text-ink">{{ name }}</div>
+      {% if informations %}
+      <ul class="list-unstyled space-y-2">
+        {% for information in informations %}
+        <li><a href="{{ information.href }}" class="text-ink-3 hover:text-primary underline">{{ information.title }}</a></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <p class="text-xs text-ink-3 mt-auto pt-4">{{ powered }}</p>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="font-bold text-sm text-ink mb-1">{{ text_service }}</div>
+      <a href="{{ contact }}" class="text-ink-3 hover:text-primary underline">{{ text_contact }}</a>
+      <a href="{{ return }}" class="text-ink-3 hover:text-primary underline">{{ text_return }}</a>
+      <a href="{{ sitemap }}" class="text-ink-3 hover:text-primary underline">{{ text_sitemap }}</a>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="font-bold text-sm text-ink mb-1">{{ text_extra }}</div>
+      <a href="{{ manufacturer }}" class="text-ink-3 hover:text-primary underline">{{ text_manufacturer }}</a>
+      <a href="{{ voucher }}" class="text-ink-3 hover:text-primary underline">{{ text_voucher }}</a>
+      <a href="{{ affiliate }}" class="text-ink-3 hover:text-primary underline">{{ text_affiliate }}</a>
+      <a href="{{ special }}" class="text-ink-3 hover:text-primary underline">{{ text_special }}</a>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="font-bold text-sm text-ink mb-1">{{ text_account }}</div>
+      <a href="{{ account }}" class="text-ink-3 hover:text-primary underline">{{ text_account }}</a>
+      <a href="{{ order }}" class="text-ink-3 hover:text-primary underline">{{ text_order }}</a>
+      <a href="{{ wishlist }}" class="text-ink-3 hover:text-primary underline">{{ text_wishlist }}</a>
+      <a href="{{ newsletter }}" class="text-ink-3 hover:text-primary underline">{{ text_newsletter }}</a>
+    </div>
+
+  </div>
+</footer>
+
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+{% if cookie_info %}
+<div id="cookie-warning" class="cookie-notification">
+  <div class="cookie-notification__container container-app">
+    <div class="cookie-notification__info">{{ cookie_info|raw }}</div>
+    <button id="accept-cookie" class="cookie-notification__btn btn btn-primary">{{ button_continue }}</button>
+  </div>
+</div>
+<script>
+  $('#accept-cookie').on('click', () => {
+    $.get('index.php?route=common/footer/applyCookieNotification');
+    $('#cookie-warning').hide();
+  });
+</script>
+{% endif %}
+
+</body></html>

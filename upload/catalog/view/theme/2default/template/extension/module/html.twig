@@ -1,0 +1,8 @@
+<div class="mb-6">
+  {% if heading_title %}
+  <h2 class="font-headline text-2xl font-extrabold text-ink tracking-tight mb-4">{{ heading_title }}</h2>
+  {% endif %}
+  <div class="prose max-w-none text-ink-2">
+    {{ html|raw }}
+  </div>
+</div>

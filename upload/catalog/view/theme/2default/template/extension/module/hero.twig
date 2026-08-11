@@ -1,0 +1,55 @@
+{% import '2default/template/common/icon.twig' as ic %}
+{#
+  Full-bleed hero banner (Design > Hero Containers, placed via Design > Layout
+  like the stock Banner module — one module instance = one hero container).
+  Full-bleed requires the parent template not to wrap {{ content_top }} /
+  {{ content_bottom }} in a container — see common/home.twig.
+  The mouse-driven background parallax is CSS-var driven: theme.js writes
+  --hero-shift-x/-y onto #hero{{ module }}, and the .hero-parallax__media
+  rule in components.css reads it via an inherited custom property — no
+  direct style rewrites here, so this markup stays effect-agnostic (still
+  looks correct, just static, with JS disabled/reduced-motion/touch). Only
+  the background media moves; .hero-parallax__content (text/buttons) is
+  deliberately static.
+#}
+<section id="hero{{ module }}" class="hero-parallax relative w-full overflow-hidden min-h-[480px] md:min-h-[600px] flex items-center">
+  <div class="hero-parallax__media absolute inset-0">
+    {% if image %}
+    <img src="{{ image }}" alt="{{ title }}" class="w-full h-full object-cover">
+    {% endif %}
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(19,27,46,.55) 0%, rgba(19,27,46,.35) 40%, rgba(11,28,48,.85) 100%);"></div>
+  </div>
+
+  <div class="hero-parallax__content container-app relative z-10 py-16 md:py-24">
+    <div class="max-w-2xl">
+      {% if eyebrow %}
+      <p class="hero-eyebrow text-xs md:text-sm font-bold uppercase tracking-widest mb-4">{{ eyebrow }}</p>
+      {% endif %}
+
+      {% if title %}
+      <h2 class="font-headline text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-5">{{ title }}</h2>
+      {% endif %}
+
+      {% if description %}
+      <p class="text-sm md:text-base text-white/80 leading-relaxed mb-8 max-w-lg">{{ description }}</p>
+      {% endif %}
+
+      {% if button_1_text or button_2_text %}
+      <div class="flex flex-wrap items-center gap-4">
+        {% if button_1_text %}
+        <a href="{{ button_1_link|default('#') }}" class="hero-cta hero-cta-primary blue-gradient blue-gradient-hover inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm">
+          {{ button_1_text }}
+          {{ ic.icon('arrow-right', 'w-4 h-4') }}
+        </a>
+        {% endif %}
+
+        {% if button_2_text %}
+        <a href="{{ button_2_link|default('#') }}" class="hero-cta hero-cta-ghost inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm">
+          {{ button_2_text }}
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>

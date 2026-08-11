@@ -1,0 +1,158 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="account-order" class="container-app py-8 md:py-12">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+  {% if success %}
+  <div class="alert alert-success alert-dismissible">{{ ic.icon('check-circle', 'w-4 h-4 inline -mt-0.5') }} {{ success }}<button type="button" class="close" data-dismiss="alert">&times;</button></div>
+  {% endif %}
+  {% if error_warning %}
+  <div class="alert alert-danger alert-dismissible">{{ ic.icon('alert-circle', 'w-4 h-4 inline -mt-0.5') }} {{ error_warning }}<button type="button" class="close" data-dismiss="alert">&times;</button></div>
+  {% endif %}
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+      <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-ink mb-6">{{ heading_title }}</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div class="bg-white rounded-2xl border border-border/40 p-5 text-sm text-ink-2 leading-relaxed">
+          {% if invoice_no %}<div><b class="text-ink">{{ text_invoice_no }}</b> {{ invoice_no }}</div>{% endif %}
+          <div><b class="text-ink">{{ text_order_id }}</b> #{{ order_id }}</div>
+          <div><b class="text-ink">{{ text_date_added }}</b> {{ date_added }}</div>
+        </div>
+        <div class="bg-white rounded-2xl border border-border/40 p-5 text-sm text-ink-2 leading-relaxed">
+          {% if payment_method %}<div><b class="text-ink">{{ text_payment_method }}</b> {{ payment_method }}</div>{% endif %}
+          {% if shipping_method %}<div><b class="text-ink">{{ text_shipping_method }}</b> {{ shipping_method }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div class="bg-white rounded-2xl border border-border/40 p-5">
+          <p class="font-headline font-bold text-sm text-ink mb-2">{{ text_payment_address }}</p>
+          <div class="text-sm text-ink-2 leading-relaxed">{{ payment_address }}</div>
+        </div>
+        {% if shipping_address %}
+        <div class="bg-white rounded-2xl border border-border/40 p-5">
+          <p class="font-headline font-bold text-sm text-ink mb-2">{{ text_shipping_address }}</p>
+          <div class="text-sm text-ink-2 leading-relaxed">{{ shipping_address }}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="bg-white rounded-2xl border border-border/40 overflow-hidden mb-3">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <td class="text-left">{{ column_name }}</td>
+                <td class="text-left">{{ column_model }}</td>
+                <td class="text-right">{{ column_quantity }}</td>
+                <td class="text-right">{{ column_price }}</td>
+                <td class="text-right">{{ column_total }}</td>
+                {% if products %}
+                <td style="width: 20px;"></td>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+              <tr>
+                <td class="text-left">{{ product.name }}
+                  {% for option in product.option %} <br/>
+                  &nbsp;<small> - {{ option.name }}: {{ option.value }}</small> {% endfor %}</td>
+                <td class="text-left">{{ product.model }}</td>
+                <td class="text-right">{{ product.quantity }}</td>
+                <td class="text-right">{{ product.price }}</td>
+                <td class="text-right">{{ product.total }}</td>
+                <td class="text-right" style="white-space: nowrap;">
+                  {% if product.reorder %}<a href="{{ product.reorder }}" data-toggle="tooltip" title="{{ button_reorder }}" class="btn btn-primary btn-sm">{{ ic.icon('shopping-cart', 'w-4 h-4') }}</a>{% endif %}
+                  <a href="{{ product.return }}" data-toggle="tooltip" title="{{ button_return }}" class="btn btn-danger btn-sm">{{ ic.icon('repeat', 'w-4 h-4') }}</a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% for voucher in vouchers %}
+              <tr>
+                <td class="text-left">{{ voucher.description }}</td>
+                <td class="text-left"></td>
+                <td class="text-right">1</td>
+                <td class="text-right">{{ voucher.amount }}</td>
+                <td class="text-right">{{ voucher.amount }}</td>
+                {% if products %}
+                <td></td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              {% for total in totals %}
+              <tr>
+                <td colspan="3"></td>
+                <td class="text-right"><b>{{ total.title }}</b></td>
+                <td class="text-right">{{ total.text }}</td>
+                {% if products %}
+                <td></td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      {% if comment %}
+      <div class="bg-white rounded-2xl border border-border/40 p-5 mb-3">
+        <p class="font-headline font-bold text-sm text-ink mb-2">{{ text_comment }}</p>
+        <div class="text-sm text-ink-2">{{ comment }}</div>
+      </div>
+      {% endif %}
+
+      {% if histories %}
+      <h2 class="font-headline text-lg font-bold text-ink mt-8 mb-3">{{ text_history }}</h2>
+      <div class="bg-white rounded-2xl border border-border/40 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <td class="text-left">{{ column_date_added }}</td>
+                <td class="text-left">{{ column_status }}</td>
+                <td class="text-left">{{ column_comment }}</td>
+              </tr>
+            </thead>
+            <tbody>
+              {% for history in histories %}
+              <tr>
+                <td class="text-left">{{ history.date_added }}</td>
+                <td class="text-left">{{ history.status }}</td>
+                <td class="text-left">{{ history.comment }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="flex justify-end mt-6">
+        <a href="{{ continue }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-sm transition-all no-underline cursor-pointer">
+          {{ button_continue }} {{ ic.icon('arrow-right', 'w-4 h-4') }}
+        </a>
+      </div>
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

@@ -1,0 +1,53 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="product-manufacturer" class="container-app py-6 md:py-12">
+
+  <nav aria-label="Breadcrumb" class="flex text-xs font-semibold text-ink-3 mb-3">
+    <ol class="inline-flex items-center flex-wrap gap-1">
+      {% for breadcrumb in breadcrumbs %}
+      {% if not loop.last %}
+      <li><a href="{{ breadcrumb.href }}" class="text-ink-3 hover:text-primary no-underline">{{ breadcrumb.text }}</a></li>
+      <li><span class="mx-1 text-border">/</span></li>
+      {% else %}
+      <li><span class="text-primary font-bold">{{ breadcrumb.text }}</span></li>
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <h1 class="font-headline text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight mb-8">{{ heading_title }}</h1>
+
+  {% if categories %}
+  <div class="mb-8">
+    <p class="text-sm font-semibold text-ink-2 mb-4">{{ text_index }}</p>
+    <div class="flex flex-wrap gap-2">
+      {% for category in categories %}
+      <a href="index.php?route=product/manufacturer#{{ category.name }}" class="px-4 py-2 bg-surface-2 hover:bg-surface-3 text-primary font-semibold text-sm rounded-lg transition-colors no-underline">{{ category.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="space-y-12">
+    {% for category in categories %}
+    <div id="{{ category.name }}">
+      <h2 class="font-headline text-xl sm:text-2xl font-bold text-ink mb-6 pb-4 border-b border-border/40">{{ category.name }}</h2>
+      {% if category.manufacturer %}
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for manufacturer in category.manufacturer %}
+        <a href="{{ manufacturer.href }}" class="p-4 bg-white rounded-lg border border-border/40 hover:border-primary hover:shadow-md transition-all no-underline text-center group">
+          <span class="text-sm font-semibold text-ink group-hover:text-primary transition-colors">{{ manufacturer.name }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-20 bg-white rounded-2xl border border-border/40 p-8 space-y-4">
+    <p class="text-sm text-ink-2">{{ text_no_results }}</p>
+    <a href="{{ continue }}" class="inline-block px-5 py-2.5 bg-accent hover:bg-primary text-white rounded-lg text-xs font-bold no-underline">{{ button_continue }}</a>
+  </div>
+  {% endif %}
+</div>
+{{ footer }}

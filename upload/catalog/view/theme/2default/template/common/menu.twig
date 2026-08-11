@@ -1,0 +1,89 @@
+{% import '2default/template/common/icon.twig' as ic %}
+{% if categories %}
+
+{# Desktop: inline nav, same row as the logo (see common/header.twig).
+   Overflow handling (theme.js#layoutNav): items that don't fit the
+   available width are hidden and relisted under the "..." trigger, which
+   itself is a Bootstrap dropdown (compat.css's existing .dropdown-menu
+   rules, no custom overrides needed). #}
+<nav id="site-nav" class="hidden md:flex items-center gap-8 h-full" aria-label="{{ text_category|default('Categories') }}">
+  {% for category in categories %}
+  {% if category.children %}
+  <div class="nav-item group relative h-full flex items-center shrink-0" data-name="{{ category.name }}" data-href="{{ category.href }}">
+    <a href="{{ category.href }}"
+       class="peer flex items-center gap-1 h-full text-sm font-medium text-ink-2 hover:text-primary border-b-2 border-transparent group-hover:border-primary group-hover:text-primary transition-colors duration-200 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
+       aria-haspopup="true">
+      {{ category.name }}
+      {{ ic.icon('chevron-down', 'w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180') }}
+    </a>
+
+    {# Dropdown: rounded-2xl elevated panel, fades + lifts in on hover/focus, transform+opacity only #}
+    <div class="absolute left-0 top-full mt-0 pt-3 invisible opacity-0 -translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 peer-focus-visible:visible peer-focus-visible:opacity-100 peer-focus-visible:translate-y-0 transition-[opacity,transform,visibility] duration-200 ease-out z-50"
+         role="menu">
+      <div class="w-max max-w-lg bg-white rounded-2xl shadow-lg border border-border/40 p-6">
+        <div class="flex flex-wrap gap-x-10 gap-y-3">
+          {% for children in category.children|batch(category.children|length / category.column|round(1, 'ceil')) %}
+          <ul class="list-none m-0 p-0 space-y-2 min-w-[160px]" role="none">
+            {% for child in children %}
+            <li role="none"><a href="{{ child.href }}" role="menuitem" class="block text-sm text-ink-2 hover:text-primary no-underline transition-colors focus-visible:outline-none focus-visible:text-primary">{{ child.name }}</a></li>
+            {% endfor %}
+          </ul>
+          {% endfor %}
+        </div>
+        <a href="{{ category.href }}" class="mt-4 pt-4 border-t border-surface-2 flex items-center gap-1.5 text-xs font-bold text-primary hover:underline no-underline">
+          {{ text_all }} {{ category.name }} {{ ic.icon('arrow-right', 'w-3.5 h-3.5') }}
+        </a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="nav-item h-full flex items-center shrink-0" data-name="{{ category.name }}" data-href="{{ category.href }}">
+    <a href="{{ category.href }}" class="flex items-center h-full text-sm font-medium text-ink-2 hover:text-primary border-b-2 border-transparent hover:border-primary transition-colors duration-200 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm">{{ category.name }}</a>
+  </div>
+  {% endif %}
+  {% endfor %}
+
+  {# Overflow trigger: hidden until theme.js#layoutNav finds items that don't
+     fit. Visibility is toggled with an inline style rather than a "hidden"
+     class, deliberately — this element also always carries "flex" for its
+     own layout, and a same-element "hidden"/"flex" class pairing is exactly
+     the kind of display-utility cascade ambiguity that caused real bugs
+     elsewhere in this build (see components.css's cart-drawer comment).
+     Inline styles have no such ambiguity. #}
+  <div id="nav-more" class="dropdown relative h-full items-center shrink-0" style="display: none;">
+    <button type="button" data-toggle="dropdown" class="flex items-center h-full px-1 text-ink-2 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm" aria-label="{{ text_all|default('More') }}">
+      {{ ic.icon('more-horizontal', 'w-5 h-5') }}
+    </button>
+    <ul id="nav-more-panel" class="dropdown-menu" role="menu"></ul>
+  </div>
+</nav>
+
+{# Mobile: panel anchored under the header row, toggled by #mobile-menu-toggle in theme.js #}
+<div id="mobile-menu-panel" class="hidden md:hidden fixed left-0 right-0 top-[5rem] bottom-0 bg-white border-t border-border/40 shadow-lg p-4 overflow-y-auto z-50 rounded-none">
+  <div class="space-y-1">
+    {% for category in categories %}
+    {% if category.children %}
+    <div class="mobile-menu-item">
+      <div class="flex items-center justify-between rounded-xl hover:bg-surface-3 transition-colors">
+        <a href="{{ category.href }}" class="text-sm font-semibold text-ink hover:text-primary no-underline flex-1 py-2.5 px-3">{{ category.name }}</a>
+        <button type="button" class="mobile-submenu-toggle p-2.5 text-icon hover:text-primary rounded-lg transition-all shrink-0 focus:outline-none" aria-expanded="false" aria-label="Toggle {{ category.name }}">
+          {{ ic.icon('chevron-down', 'w-4 h-4 transition-transform duration-200') }}
+        </button>
+      </div>
+      <div class="mobile-submenu hidden pl-4 pr-2 py-1 space-y-1">
+        {% for child in category.children %}
+        <a href="{{ child.href }}" class="block py-2 px-3 rounded-lg text-sm text-ink-2 hover:text-primary hover:bg-surface-3 no-underline transition-colors">{{ child.name }}</a>
+        {% endfor %}
+        <a href="{{ category.href }}" class="block py-2 px-3 rounded-lg text-xs font-bold text-primary hover:underline no-underline">{{ text_all }} {{ category.name }}</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="mobile-menu-item">
+      <a href="{{ category.href }}" class="block py-2.5 px-3 rounded-xl text-sm font-semibold text-ink hover:text-primary hover:bg-surface-3 no-underline transition-colors">{{ category.name }}</a>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% endif %}

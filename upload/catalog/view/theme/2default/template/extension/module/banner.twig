@@ -1,0 +1,26 @@
+<div class="container-app py-4">
+  <div class="swiper-viewport rounded-2xl overflow-hidden shadow-sm border border-border/40">
+    <div id="banner{{ module }}" class="swiper-container">
+      <div class="swiper-wrapper">
+        {% for banner in banners %}
+        <div class="swiper-slide">
+          {% if banner.link %}
+          <a href="{{ banner.link }}" class="block w-full h-full">
+            <img src="{{ banner.image }}" alt="{{ banner.title }}" class="w-full h-auto object-cover rounded-2xl" />
+          </a>
+          {% else %}
+          <img src="{{ banner.image }}" alt="{{ banner.title }}" class="w-full h-auto object-cover rounded-2xl" />
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$('#banner{{ module }}').swiper({
+	effect: 'fade',
+	autoplay: 2500,
+	autoplayDisableOnInteraction: false
+});
+</script>

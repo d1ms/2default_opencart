@@ -1,0 +1,17 @@
+<div class="bg-white rounded-2xl border border-border/40 p-5 mb-6">
+  <h3 class="font-headline text-sm font-bold text-ink uppercase tracking-wide pb-3 mb-3 border-b border-border/40">{{ heading_title }}</h3>
+  <p class="text-sm text-ink-2 mb-3 text-center">{{ text_store }}</p>
+  <div class="flex flex-col gap-1">
+    {% for store in stores %}
+    {% if store.store_id == store_id %}
+    <a href="{{ store.url }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold bg-primary/10 text-primary no-underline">
+      {{ store.name }}
+    </a>
+    {% else %}
+    <a href="{{ store.url }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-3 hover:text-primary no-underline transition-colors">
+      {{ store.name }}
+    </a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>

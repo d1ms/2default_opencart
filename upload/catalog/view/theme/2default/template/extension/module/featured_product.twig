@@ -1,0 +1,10 @@
+{% if products %}
+<div class="bg-white mt-3 rounded-2xl border border-border/40 p-5 mb-6">
+  <h3 class="font-headline text-sm font-bold text-ink uppercase tracking-wide pb-3 mb-4 border-b border-border/40">{{ heading_title }}</h3>
+  <div class="product-card-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+    {% for product in products %}
+    {% include '2default/template/common/product_thumb.twig' with {'product': product} %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

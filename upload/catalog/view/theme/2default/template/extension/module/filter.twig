@@ -1,0 +1,36 @@
+<div class="bg-white rounded-2xl border border-border/40 p-5 mb-6">
+  <h3 class="font-headline text-sm font-bold text-ink uppercase tracking-wide pb-3 mb-4 border-b border-border/40">{{ heading_title }}</h3>
+  <div class="space-y-4">
+    {% for filter_group in filter_groups %}
+    <div>
+      <h4 class="text-xs font-bold text-ink uppercase tracking-wide mb-2">{{ filter_group.name }}</h4>
+      <div id="filter-group{{ filter_group.filter_group_id }}" class="flex flex-col gap-2">
+        {% for filter in filter_group.filter %}
+        <label class="flex items-center gap-2 cursor-pointer text-sm text-ink-2 hover:text-ink">
+          {% if filter.filter_id in filter_category %}
+          <input type="checkbox" name="filter[]" value="{{ filter.filter_id }}" checked="checked" class="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 cursor-pointer" />
+          {% else %}
+          <input type="checkbox" name="filter[]" value="{{ filter.filter_id }}" class="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 cursor-pointer" />
+          {% endif %}
+          <span>{{ filter.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="mt-5 pt-4 border-t border-border/40">
+    <button type="button" id="button-filter" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-sm transition-all cursor-pointer">{{ button_filter }}</button>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-filter').on('click', function() {
+	filter = [];
+
+	$('input[name^=\'filter\']:checked').each(function(element) {
+		filter.push(this.value);
+	});
+
+	location = '{{ action|escape('js') }}&filter=' + filter.join(',');
+});
+//--></script>

@@ -1,0 +1,197 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="product-search" class="container-app py-6 md:py-12">
+
+  <nav aria-label="Breadcrumb" class="flex text-xs font-semibold text-ink-3 mb-3">
+    <ol class="inline-flex items-center flex-wrap gap-1">
+      {% for breadcrumb in breadcrumbs %}
+      {% if not loop.last %}
+      <li><a href="{{ breadcrumb.href }}" class="text-ink-3 hover:text-primary no-underline">{{ breadcrumb.text }}</a></li>
+      <li><span class="mx-1 text-border">/</span></li>
+      {% else %}
+      <li><span class="text-primary font-bold">{{ breadcrumb.text }}</span></li>
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <h1 class="font-headline text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight mb-8">{{ heading_title }}</h1>
+
+  <div class="bg-white rounded-xl border border-border/40 p-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-semibold text-ink mb-2">{{ entry_search }}</label>
+        <input type="text" name="search" value="{{ search }}" placeholder="{{ text_keyword }}" id="input-search" class="w-full px-4 py-2.5 border border-border rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-ink mb-2">{{ text_category }}</label>
+        <div class="relative">
+          <select name="category_id" class="w-full appearance-none px-4 py-2.5 border border-border rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 bg-white">
+            <option value="0">{{ text_category }}</option>
+            {% for category_1 in categories %}
+            {% if category_1.category_id == category_id %}
+            <option value="{{ category_1.category_id }}" selected="selected">{{ category_1.name }}</option>
+            {% else %}
+            <option value="{{ category_1.category_id }}">{{ category_1.name }}</option>
+            {% endif %}
+            {% for category_2 in category_1.children %}
+            {% if category_2.category_id == category_id %}
+            <option value="{{ category_2.category_id }}" selected="selected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
+            {% else %}
+            <option value="{{ category_2.category_id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
+            {% endif %}
+            {% for category_3 in category_2.children %}
+            {% if category_3.category_id == category_id %}
+            <option value="{{ category_3.category_id }}" selected="selected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
+            {% else %}
+            <option value="{{ category_3.category_id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% endfor %}
+          </select>
+          {{ ic.icon('chevron-down', 'w-3.5 h-3.5 text-ink-3 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none') }}
+        </div>
+      </div>
+
+      <div class="flex items-end">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" name="sub_category" value="1" {% if sub_category %}checked="checked"{% endif %} class="w-4 h-4 appearance-none border border-border rounded checked:bg-primary checked:border-primary cursor-pointer" />
+          <span class="text-sm text-ink">{{ text_sub_category }}</span>
+        </label>
+      </div>
+
+      <div class="flex items-end">
+        <button type="button" id="button-search" class="w-full px-4 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold text-sm rounded-lg transition-colors flex items-center justify-center gap-2">
+          {{ ic.icon('search', 'w-4 h-4') }}
+          {{ button_search }}
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-4 pt-4 border-t border-border/40">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="description" value="1" id="description" {% if description %}checked="checked"{% endif %} class="w-4 h-4 appearance-none border border-border rounded checked:bg-primary checked:border-primary cursor-pointer" />
+        <span class="text-sm text-ink">{{ entry_description }}</span>
+      </label>
+    </div>
+  </div>
+
+  {% if products %}
+  <div class="product-specify-bar w-full mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="relative shrink-0 md:ml-auto">
+      <select id="product-sorting-box" class="appearance-none font-semibold text-xs md:text-sm text-ink bg-white border border-border rounded-lg pl-4 pr-8 py-2.5 hover:border-primary transition-colors cursor-pointer" onchange="location = this.value;">
+        {% for s in sorts %}
+        {% if s.value == '%s-%s'|format(sort, order) %}
+        <option value="{{ s.href }}" selected="selected">{{ s.text }}</option>
+        {% else %}
+        <option value="{{ s.href }}">{{ s.text }}</option>
+        {% endif %}
+        {% endfor %}
+      </select>
+      {{ ic.icon('chevron-down', 'w-3.5 h-3.5 text-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none') }}
+    </div>
+  </div>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for product in products %}
+        {% include '2default/template/common/product_thumb.twig' with {'product': product} %}
+        {% endfor %}
+      </div>
+
+      <div class="mt-14 flex items-center justify-between flex-wrap gap-4">
+        <span class="text-xs text-ink-3">{{ results }}</span>
+        <div class="pagination-app">{{ pagination|raw }}</div>
+      </div>
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+  {% else %}
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+
+      <div class="text-center py-20 bg-white rounded-2xl border border-border/40 p-8 space-y-4">
+        <p class="text-sm text-ink-2">{{ text_empty }}</p>
+      </div>
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+  {% endif %}
+</div>
+{{ footer }}
+
+<script type="text/javascript"><!--
+$('#button-search').bind('click', function() {
+	url = 'index.php?route=product/search';
+
+	var search = $('#product-search input[name=\'search\']').prop('value');
+
+	if (search) {
+		url += '&search=' + encodeURIComponent(search);
+	}
+
+	var category_id = $('#product-search select[name=\'category_id\']').prop('value');
+
+	if (category_id > 0) {
+		url += '&category_id=' + encodeURIComponent(category_id);
+	}
+
+	var sub_category = $('#product-search input[name=\'sub_category\']:checked').prop('value');
+
+	if (sub_category) {
+		url += '&sub_category=true';
+	}
+
+	var filter_description = $('#product-search input[name=\'description\']:checked').prop('value');
+
+	if (filter_description) {
+		url += '&description=true';
+	}
+
+	location = url;
+});
+
+$('#product-search input[name=\'search\']').bind('keydown', function(e) {
+	if (e.keyCode == 13) {
+		$('#button-search').trigger('click');
+	}
+});
+
+$('#product-search select[name=\'category_id\']').on('change', function() {
+	if (this.value == '0') {
+		$('#product-search input[name=\'sub_category\']').prop('disabled', true);
+	} else {
+		$('#product-search input[name=\'sub_category\']').prop('disabled', false);
+	}
+});
+
+$('#product-search select[name=\'category_id\']').trigger('change');
+--></script>

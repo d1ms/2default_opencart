@@ -1,0 +1,35 @@
+{{ header }}
+<div id="common-home">
+  {% if column_left or column_right %}
+  <div class="container-app py-6 md:py-12">
+    <div class="row">
+      {{ column_left }}
+      {% if column_left and column_right %}
+      {% set class = 'col-sm-6' %}
+      {% elseif column_left or column_right %}
+      {% set class = 'col-sm-9' %}
+      {% else %}
+      {% set class = 'col-sm-12' %}
+      {% endif %}
+      <div id="content" class="{{ class }}">
+        {{ content_top }}
+        {{ content_bottom }}
+      </div>
+      {{ column_right }}
+    </div>
+  </div>
+  {% else %}
+  {#
+    No sidebar: render content_top/content_bottom with nothing wrapping
+    them, so full-bleed modules (Hero) truly span the viewport. Modules
+    that need a contained width (featured products, carousel, etc.)
+    already wrap themselves in container-app internally — see
+    extension/module/featured_product.twig for the established pattern.
+  #}
+  <div id="content">
+    {{ content_top }}
+    {{ content_bottom }}
+  </div>
+  {% endif %}
+</div>
+{{ footer }}

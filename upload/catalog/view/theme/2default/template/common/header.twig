@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ title }}</title>
+{% if robots %}
+<meta name="robots" content="{{ robots }}">
+{% endif %}
+<base href="{{ base }}">
+{% if description %}
+<meta name="description" content="{{ description }}">
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content="{{ keywords }}">
+{% endif %}
+<meta property="og:title" content="{{ title }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ og_url }}">
+{% if og_image %}
+<meta property="og:image" content="{{ og_image }}">
+{% else %}
+<meta property="og:image" content="{{ logo }}">
+{% endif %}
+<meta property="og:site_name" content="{{ name }}">
+<link href="catalog/view/theme/2default/fonts/Inter-Regular.woff2" rel="preload" as="font" type="font/woff2" crossorigin>
+<link href="catalog/view/theme/2default/fonts/Inter-Medium.woff2" rel="preload" as="font" type="font/woff2" crossorigin>
+<link href="catalog/view/theme/2default/fonts/Inter-Bold.woff2" rel="preload" as="font" type="font/woff2" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="catalog/view/javascript/jquery/jquery-3.7.1.min.js"></script>
+<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js"></script>
+<link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="catalog/view/theme/2default/stylesheet/stylesheet.css" rel="stylesheet">
+{% if theme_2default_colors_css %}
+<style id="theme-color-variables">
+  :root {
+    {{ theme_2default_colors_css|raw }}
+  }
+</style>
+{% endif %}
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}">
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}"></script>
+{% endfor %}
+<script src="catalog/view/javascript/common.js"></script>
+<script src="catalog/view/theme/2default/js/theme.js"></script>
+{% for link in links %}
+<link href="{{ link.href }}" rel="{{ link.rel }}">
+{% endfor %}
+{% for analytic in analytics %}
+{{ analytic }}
+{% endfor %}
+</head>
+<body>
+{% import '2default/template/common/icon.twig' as ic %}
+
+<header id="site-header" class="site-header-glass w-full sticky top-0 z-50 border-b border-border/30 shadow-xs">
+  <div id="header-row" class="container-app relative flex items-center justify-between h-20 gap-2 md:gap-4">
+
+    <button type="button" id="mobile-menu-toggle" class="md:hidden text-icon hover:text-primary p-2 -ml-2 rounded-lg transition-colors shrink-0" aria-label="{{ text_category|default('Menu') }}" aria-expanded="false" aria-controls="mobile-menu-panel">
+      <span id="mobile-menu-icon-open">{{ ic.icon('menu', 'w-6 h-6') }}</span>
+      <span id="mobile-menu-icon-close" class="hidden">{{ ic.icon('x', 'w-6 h-6') }}</span>
+    </button>
+
+    <a href="{{ home }}" class="font-headline text-xl md:text-2xl font-extrabold tracking-tight text-primary flex items-center gap-2 select-none no-underline shrink-0">
+      {% if logo %}
+      <img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" class="h-8 w-auto md:h-9">
+      {% else %}
+      {{ name }}
+      {% endif %}
+    </a>
+
+    {{ menu }}
+
+    <div id="header-actions" class="flex items-center gap-1 md:gap-3 shrink-0 ml-auto">
+      <button type="button" id="search-open" class="text-icon hover:text-primary p-2 rounded-full hover:bg-surface-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-haspopup="dialog" aria-controls="search-modal" title="{{ text_search }}">
+        {{ ic.icon('search', 'w-5 h-5') }}
+      </button>
+
+      <a href="{{ account }}" class="hidden sm:inline-flex text-icon hover:text-primary p-2 rounded-full hover:bg-surface-3 transition-all no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" title="{{ text_account }}">
+        {{ ic.icon('user', 'w-5 h-5') }}
+      </a>
+
+      <a href="{{ wishlist }}" id="wishlist-total" class="relative text-icon hover:text-danger p-2 rounded-full hover:bg-danger-soft/30 transition-all no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger" title="{{ text_wishlist }}">
+        {{ ic.icon('heart', 'w-5 h-5') }}
+        <span class="wishlist-badge{% if not wishlist_count or wishlist_count == 0 %} is-hidden{% endif %}">{{ wishlist_count|default(0) }}</span>
+      </a>
+
+      {{ cart }}
+    </div>
+  </div>
+
+  {# common.js's search click handler reads the value via
+     $('header #search input[name="search"]').val() — #search-modal (a
+     fixed-position overlay, so its place in the DOM doesn't affect layout)
+     must stay inside <header> or that selector matches nothing and the
+     term never reaches the URL, regardless of the button working. #}
+  {{ search }}
+</header>
+
+<div id="cart-drawer-backdrop" class="fixed inset-0 z-40 bg-ink/60 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true"></div>
+
+{# Toasts replace Bootstrap's .alert-dismissible banners — see theme.js's
+   toastFromAlert()/showToast(), which intercepts every alert common.js (and
+   this theme's own inline scripts) inject and reroutes it here instead. #}
+<div id="toast-container" aria-live="polite" aria-atomic="false"></div>

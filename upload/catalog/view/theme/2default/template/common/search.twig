@@ -1,0 +1,22 @@
+{#
+  Rendered once into common/header.twig. common.js already wires up
+  '#search input[name="search"]' + its sibling button to submit a normal GET
+  to product/search on click or Enter — kept as-is, just wrapped in the
+  2default modal shell. The submit button must be a real, visible sibling of
+  the input (not .sr-only — that clips to 1x1px, so mouse users had nothing
+  to click and Enter was the only working path). #search-modal is
+  opened/closed by theme.js toggling .is-open on the overlay (see js/theme.js).
+#}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="search-modal" class="site-overlay overflow-x-hidden" role="dialog" aria-modal="true" aria-label="{{ text_search }}">
+  <div class="site-modal-panel !rounded-3xl space-y-4 max-w-full overflow-x-hidden">
+    <div class="flex items-center gap-2 sm:gap-3 border-b border-border/30 pb-3 w-full min-w-0">
+      <div id="search" class="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
+        {{ ic.icon('search', 'w-4 h-4 text-icon shrink-0') }}
+        <input type="text" name="search" value="{{ search }}" placeholder="{{ text_search }}" autocomplete="off" class="flex-1 min-w-0 border-none outline-none text-sm font-semibold text-ink bg-transparent">
+        <button type="button" class="shrink-0 px-3 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-lg transition-colors">{{ text_search }}</button>
+      </div>
+      <button type="button" data-close-overlay="search-modal" class="text-icon hover:text-primary p-1 shrink-0" aria-label="Close">{{ ic.icon('x', 'w-4 h-4') }}</button>
+    </div>
+  </div>
+</div>

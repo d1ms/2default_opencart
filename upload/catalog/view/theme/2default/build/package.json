@@ -1,0 +1,15 @@
+{
+  "name": "2default-theme-build",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dev-only Tailwind CSS build for the OpenCart 3 '2default' theme. Not required at runtime — the compiled output is committed to ../stylesheet/stylesheet.css.",
+  "scripts": {
+    "build": "tailwindcss -i ./src/theme.css -o ../stylesheet/stylesheet.css --minify",
+    "watch": "tailwindcss -i ./src/theme.css -o ../stylesheet/stylesheet.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.14",
+    "lucide-static": "^1.30.0",
+    "tailwindcss": "^4.1.14"
+  }
+}

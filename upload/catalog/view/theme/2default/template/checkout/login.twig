@@ -1,0 +1,41 @@
+{% import '2default/template/common/icon.twig' as ic %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="bg-white rounded-2xl border border-border/40 p-6">
+    <h2 class="font-headline text-lg font-bold text-ink mb-1">{{ text_new_customer }}</h2>
+    <p class="text-sm text-ink-2 mb-4">{{ text_checkout }}</p>
+    <div class="radio">
+      <label> {% if account == 'register' %}
+        <input type="radio" name="account" value="register" checked="checked" />
+        {% else %}
+        <input type="radio" name="account" value="register" />
+        {% endif %}
+        {{ text_register }}</label>
+    </div>
+    {% if checkout_guest %}
+    <div class="radio">
+      <label> {% if account == 'guest' %}
+        <input type="radio" name="account" value="guest" checked="checked" />
+        {% else %}
+        <input type="radio" name="account" value="guest" />
+        {% endif %}
+        {{ text_guest }}</label>
+    </div>
+    {% endif %}
+    <p class="text-xs text-ink-3 mt-3 mb-4">{{ text_register_account }}</p>
+    <input type="button" value="{{ button_continue }}" id="button-account" data-loading-text="{{ text_loading }}" class="btn btn-primary" />
+  </div>
+  <div class="bg-white rounded-2xl border border-border/40 p-6">
+    <h2 class="font-headline text-lg font-bold text-ink mb-1">{{ text_returning_customer }}</h2>
+    <p class="text-sm text-ink-2 mb-4">{{ text_i_am_returning_customer }}</p>
+    <div class="form-group">
+      <label class="control-label" for="input-email">{{ entry_email }}</label>
+      <input type="text" name="email" value="" placeholder="{{ entry_email }}" id="input-email" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="input-password">{{ entry_password }}</label>
+      <input type="password" name="password" value="" placeholder="{{ entry_password }}" id="input-password" class="form-control" />
+      <a href="{{ forgotten }}" class="text-xs text-primary no-underline hover:underline mt-1 inline-block">{{ text_forgotten }}</a>
+    </div>
+    <input type="button" value="{{ button_login }}" id="button-login" data-loading-text="{{ text_loading }}" class="btn btn-primary" />
+  </div>
+</div>

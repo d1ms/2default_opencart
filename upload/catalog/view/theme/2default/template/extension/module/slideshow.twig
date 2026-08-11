@@ -1,0 +1,36 @@
+<div class="slideshow swiper-viewport relative rounded-2xl overflow-hidden shadow-sm border border-border/40 mb-6">
+  <div id="slideshow{{ module }}" class="swiper-container">
+    <div class="swiper-wrapper">
+      {% for banner in banners %}
+      <div class="swiper-slide text-center">
+        {% if banner.link %}
+        <a href="{{ banner.link }}" class="block w-full h-full">
+          <img src="{{ banner.image }}" alt="{{ banner.title }}" class="w-full h-auto object-cover rounded-2xl" />
+        </a>
+        {% else %}
+        <img src="{{ banner.image }}" alt="{{ banner.title }}" class="w-full h-auto object-cover rounded-2xl" />
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="swiper-pagination slideshow{{ module }}"></div>
+  <div class="swiper-pager">
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
+</div>
+<script>
+$('#slideshow{{ module }}').swiper({
+	mode: 'horizontal',
+	slidesPerView: 1,
+	pagination: '.slideshow{{ module }}',
+	paginationClickable: true,
+	nextButton: '#slideshow{{ module }} + .swiper-pager .swiper-button-next, .slideshow .swiper-button-next',
+	prevButton: '#slideshow{{ module }} + .swiper-pager .swiper-button-prev, .slideshow .swiper-button-prev',
+	spaceBetween: 30,
+	autoplay: 2500,
+	autoplayDisableOnInteraction: true,
+	loop: true
+});
+</script>

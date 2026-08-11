@@ -1,0 +1,61 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="account-reset" class="container-app py-8 md:py-12">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+      <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-ink mb-6">{{ heading_title }}</h1>
+
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" class="space-y-4 max-w-xl">
+        <fieldset class="bg-white rounded-2xl border border-border/40 p-5 md:p-6">
+          <legend class="font-headline text-lg font-bold text-ink mb-4">{{ text_password }}</legend>
+          <div class="form-group">
+            <label class="control-label" for="input-password">{{ entry_password }}</label>
+            <div class="form-control-icon-wrap">
+              {{ ic.icon('shield-check', 'w-4 h-4') }}
+              <input type="password" name="password" value="{{ password }}" id="input-password" class="form-control" />
+              <button type="button" class="form-control-toggle" aria-pressed="false" aria-label="{{ entry_password }}" data-toggle="tooltip" title="{{ entry_password }}">{{ ic.icon('eye', 'w-4 h-4') }}</button>
+            </div>
+            {% if error_password %}
+            <div class="text-danger">{{ error_password }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group mb-0">
+            <label class="control-label" for="input-confirm">{{ entry_confirm }}</label>
+            <div class="form-control-icon-wrap">
+              {{ ic.icon('shield-check', 'w-4 h-4') }}
+              <input type="password" name="confirm" value="{{ confirm }}" id="input-confirm" class="form-control" />
+              <button type="button" class="form-control-toggle" aria-pressed="false" aria-label="{{ entry_confirm }}" data-toggle="tooltip" title="{{ entry_confirm }}">{{ ic.icon('eye', 'w-4 h-4') }}</button>
+            </div>
+            {% if error_confirm %}
+            <div class="text-danger">{{ error_confirm }}</div>
+            {% endif %}
+          </div>
+        </fieldset>
+
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+          <a href="{{ back }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-surface-2 hover:bg-surface-3 text-ink-2 hover:text-ink font-headline font-bold text-sm border border-border/60 transition-all no-underline cursor-pointer">{{ ic.icon('arrow-left', 'w-4 h-4') }} <span>{{ button_back }}</span></a>
+          <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-sm transition-all no-underline cursor-pointer"><span>{{ button_continue }}</span> {{ ic.icon('arrow-right', 'w-4 h-4') }}</button>
+        </div>
+      </form>
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

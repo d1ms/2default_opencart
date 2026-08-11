@@ -1,0 +1,31 @@
+{#
+  Loaded via AJAX into blog/article.twig's #review div (inside the
+  #article-reviews section). Mirrors product/review.twig's card design —
+  kept as its own top-level template since it's fetched with
+  $('#review').load(...), so it needs its own icon.twig import.
+#}
+{% import '2default/template/common/icon.twig' as ic %}
+{% if reviews %}
+<div class="flex flex-col gap-4">
+  {% for review in reviews %}
+  <div class="rounded-2xl border border-border/40 bg-white p-4 md:p-5">
+    <div class="flex items-center justify-between gap-3 mb-2 flex-wrap">
+      <span class="font-headline font-bold text-sm text-ink">{{ review.author }}</span>
+      <span class="text-xs text-ink-3">{{ review.date_added }}</span>
+    </div>
+    <div class="flex items-center gap-0.5 mb-2.5" aria-hidden="true">
+      {% for i in 1..5 %}
+      {{ ic.icon('star', 'w-3.5 h-3.5 ' ~ (i <= review.rating ? 'text-accent fill-current' : 'text-border')) }}
+      {% endfor %}
+    </div>
+    <p class="text-sm text-ink-2 leading-relaxed">{{ review.text }}</p>
+  </div>
+  {% endfor %}
+</div>
+<div class="flex items-center justify-between gap-4 flex-wrap mt-5 text-xs text-ink-3">
+  <div>{{ results }}</div>
+  <div>{{ pagination }}</div>
+</div>
+{% else %}
+<p class="text-sm text-ink-2">{{ text_no_reviews }}</p>
+{% endif %}

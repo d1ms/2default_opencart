@@ -1,0 +1,48 @@
+{% if banners %}
+<div class="container-app py-8 md:py-12">
+  <div class="brand-carousel swiper-viewport">
+    <div id="carousel{{ module }}" class="swiper-container">
+      <div class="swiper-wrapper">
+        {% for banner in banners %}
+        <div class="swiper-slide">
+          {% if banner.link %}
+          <a href="{{ banner.link }}" class="brand-card">
+          {% else %}
+          <span class="brand-card">
+          {% endif %}
+            <span class="brand-card-well brand-tint-{{ loop.index0 % 4 }}">
+              <img src="{{ banner.image }}" alt="{{ banner.title }}" loading="lazy">
+            </span>
+            <span class="brand-card-name">{{ banner.title }}</span>
+          {% if banner.link %}
+          </a>
+          {% else %}
+          </span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="swiper-pager">
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+  </div>
+</div>
+<script>
+$('#carousel{{ module }}').swiper({
+	mode: 'horizontal',
+	slidesPerView: 5,
+	spaceBetween: 20,
+	nextButton: '#carousel{{ module }} + .swiper-pager .swiper-button-next',
+	prevButton: '#carousel{{ module }} + .swiper-pager .swiper-button-prev',
+	autoplay: 3500,
+	loop: true,
+	breakpoints: {
+		1024: { slidesPerView: 4 },
+		768: { slidesPerView: 3 },
+		480: { slidesPerView: 2 }
+	}
+});
+</script>
+{% endif %}

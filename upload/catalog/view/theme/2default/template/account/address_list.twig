@@ -1,0 +1,60 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="account-address" class="container-app py-8 md:py-12">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+  {% if success %}
+  <div class="alert alert-success alert-dismissible">{{ ic.icon('check-circle', 'w-4 h-4 inline -mt-0.5') }} {{ success }}</div>
+  {% endif %}
+  {% if error_warning %}
+  <div class="alert alert-warning">{{ ic.icon('alert-circle', 'w-4 h-4 inline -mt-0.5') }} {{ error_warning }}</div>
+  {% endif %}
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+      <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-ink mb-6 flex items-center gap-2">{{ ic.icon('map-pin', 'w-6 h-6 text-primary') }} {{ text_address_book }}</h1>
+
+      {% if addresses %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {% for result in addresses %}
+        <div class="flex flex-col gap-3 p-4 rounded-2xl bg-white border border-border/40 hover:border-primary transition-all">
+          <div class="flex-1 text-sm text-ink-2 leading-relaxed">{{ result.address }}</div>
+          <div class="flex items-center gap-2">
+            <a href="{{ result.update }}" class="btn btn-default btn-sm">{{ ic.icon('pencil', 'w-4 h-4') }} {{ button_edit }}</a>
+            <form action="{{ result.delete }}" method="post" enctype="multipart/form-data" id="form-address-{{ result.address_id }}">
+              <a href="{{ result.delete }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm" onclick="return confirm('{{ text_confirm }}')">{{ ic.icon('trash', 'w-4 h-4') }} {{ button_delete }}</a>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-20 bg-white rounded-2xl border border-border/40 space-y-3">
+        {{ ic.icon('map-pin', 'w-10 h-10 text-border mx-auto') }}
+        <p class="text-sm text-ink-2">{{ text_empty }}</p>
+      </div>
+      {% endif %}
+
+      <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
+        <a href="{{ back }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-surface-2 hover:bg-surface-3 text-ink-2 hover:text-ink font-headline font-bold text-sm border border-border/60 transition-all no-underline cursor-pointer">{{ ic.icon('arrow-left', 'w-4 h-4') }} <span>{{ button_back }}</span></a>
+        <a href="{{ add }}" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-accent hover:bg-primary text-white font-headline font-bold text-sm shadow-sm transition-all no-underline cursor-pointer"><span>{{ button_new_address }}</span> {{ ic.icon('plus', 'w-4 h-4') }}</a>
+      </div>
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

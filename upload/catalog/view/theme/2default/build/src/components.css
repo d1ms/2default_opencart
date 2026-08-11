@@ -1,0 +1,1048 @@
+/*
+ * Hand-built chrome for interactive pieces that need state-based selectors
+ * (Bootstrap's .open, .in) rather than plain utility classes: the cart
+ * drawer, the search modal, and the generic drawer/modal pattern reused by
+ * later phases (wishlist, size guide).
+ *
+ * Specificity is intentionally raised with #ids so these reliably win over
+ * the generic .dropdown-menu / .modal rules in compat.css regardless of
+ * import order.
+ */
+
+/* ---------- Base Interactive Pointers ---------- */
+button,
+[role="button"],
+.btn,
+#site-header button,
+#site-header a,
+#header-actions button,
+#header-actions a,
+[onclick*="cart"],
+[onclick*="wishlist"] {
+  cursor: pointer;
+}
+
+/* ---------- Toast notifications (replaces Bootstrap .alert-dismissible) ---------- */
+/*
+  Both common.js (cart/wishlist/compare success) and this theme's own inline
+  scripts (product review submit, option-validation errors) inject Bootstrap
+  ".alert alert-{success,danger,warning,info} alert-dismissible" banners
+  above the page content on every interactive action. theme.js intercepts
+  those DOM insertions (on ajaxComplete, and once on DOMReady for anything
+  server-rendered on page load) and reroutes the same message into a toast
+  here instead, rather than leaving the old inline banner in place — see
+  theme.js's toastFromAlert()/showToast(). Colors match compat.css's
+  .alert-* palette so both surfaces stay visually consistent.
+*/
+#toast-container {
+  position: fixed;
+  z-index: 1200;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: min(22rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  #toast-container {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+}
+/*
+  Repainted to match the rest of the theme's floating-surface language
+  (cart drawer items, nav dropdown panel): bg-white, rounded-2xl,
+  border-border/40 hairline + soft shadow — rather than the thin colored
+  left-border-strip look of a generic Bootstrap alert. The type color
+  lives on a circular icon badge instead (same "tinted circle" pattern as
+  the header's icon buttons: rounded-full, bg-{color}/10, text-{color}),
+  so it reads as an on-brand notification rather than a repainted banner.
+*/
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 12px 28px rgba(19, 27, 46, 0.12), 0 2px 6px rgba(19, 27, 46, 0.06);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-ink);
+  opacity: 0;
+  transform: translateY(0.5rem) scale(0.97);
+  transition: opacity 0.22s ease-out, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.toast.is-leaving {
+  opacity: 0;
+  transform: translateY(0.25rem) scale(0.98);
+  transition-duration: 0.15s;
+}
+.toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+}
+.toast-icon svg { width: 1.05rem; height: 1.05rem; }
+.toast-message {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+  font-weight: 600;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+.toast-close {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.2rem -0.25rem -0.2rem 0;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--color-ink-3);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.toast-close:hover { color: var(--color-ink); background: var(--color-surface-3); }
+
+.toast-success .toast-icon { background: color-mix(in srgb, #059669 12%, transparent); color: #059669; }
+.toast-danger  .toast-icon { background: color-mix(in srgb, var(--color-danger) 12%, transparent); color: var(--color-danger); }
+.toast-warning .toast-icon { background: color-mix(in srgb, #b45309 12%, transparent); color: #b45309; }
+.toast-info    .toast-icon { background: color-mix(in srgb, var(--color-primary) 10%, transparent); color: var(--color-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { transition: opacity 0.12s linear; transform: none !important; }
+}
+
+/* ---------- Header glass background ---------- */
+/*
+  The header used Tailwind's backdrop-blur-md directly on #site-header, but
+  that makes #site-header a *containing block* for any position:fixed
+  descendant (CSS: an ancestor with backdrop-filter/filter/transform/
+  perspective/will-change establishes the containing block instead of the
+  viewport). #cart's drawer <ul> is position:fixed and lives inside the
+  header, so it was being sized/positioned relative to the ~80px header box
+  instead of the full viewport — full-height/right-offset math was correct
+  in isolation but resolved against the wrong box.
+  Fix: move the blur onto a ::before pseudo-layer. A pseudo-element is a
+  sibling in the render tree, not an ancestor of the header's real children,
+  so it doesn't affect their containing-block calculation.
+*/
+.site-header-glass {
+  background: transparent;
+}
+.site-header-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-header-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* ---------- Cart header button badge ---------- */
+
+.cart-badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(19, 27, 46, 0.15);
+}
+.cart-badge.is-hidden {
+  display: none;
+}
+
+.wishlist-badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(19, 27, 46, 0.15);
+}
+.wishlist-badge.is-hidden {
+  display: none;
+}
+
+/* ---------- Cart drawer (built from a repurposed Bootstrap dropdown) ---------- */
+
+#cart .cart-drawer-list.dropdown-menu {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  /* compat.css's base .dropdown-menu rule sets left:0 (for Bootstrap-style
+     flyouts); this rule never declared its own left, so that leaked in per
+     property and, combined with right + an explicit width, over-constrained
+     the box — the spec then drops `right`, pinning the drawer to the left
+     edge instead of sliding in from the right. */
+  left: auto;
+  right: -30rem;
+  /* Explicit height ensures the drawer fills the full viewport even when
+     Bootstrap's .open > .dropdown-menu switches display to block, which
+     would otherwise cause the flex column to shrink to content height. */
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  width: 100%;
+  max-width: 26rem;
+  /* Top padding is now 0 — the sticky header row (.cart-drawer-header)
+     inside the <ul> provides the visual header space and the close button. */
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  box-shadow: -20px 0 60px rgba(19, 27, 46, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1050;
+}
+/*
+  The .open -> visible transition (slide-in transform, backdrop opacity,
+  body scroll lock) is driven directly by theme.js as inline styles, not
+  by a "#cart.open ..." selector here. #cart-drawer-backdrop isn't even a
+  DOM sibling of #cart (it sits after </header>; #cart is nested inside
+  the header's action row), so a `~` sibling selector could never match
+  it — and separately, a higher-specificity "#cart.open ..." rule with
+  !important was observed to still lose to the base rule under this
+  theme's Tailwind cascade-layer build output. Inline styles sidestep
+  both problems.
+*/
+/* Sticky header row: contains the title and the close (×) button */
+.cart-drawer-header {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(195, 198, 215, 0.4);
+  background: #faf8ff;
+  /* Stick to the top of the scrollable drawer */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex-shrink: 0;
+}
+.cart-drawer-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+.cart-drawer-close {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center !important;
+  width: 32px !important;
+  height: 2rem;
+  padding: 0 !important;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--color-icon);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.cart-drawer-close:hover {
+  background: var(--color-surface-3);
+  color: var(--color-ink);
+}
+
+/* Scrollable body — takes all remaining height */
+.cart-drawer-body {
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cart-drawer-item, .cart-drawer-empty { list-style: none; }
+.cart-drawer-item a.font-headline { max-width: 90%; }
+.cart-drawer-summary { list-style: none; margin-top: auto; }
+
+@media (max-width: 480px) {
+  #cart .cart-drawer-list.dropdown-menu { max-width: 100%; }
+}
+
+/* ---------- Generic overlay drawer/modal pattern (search, size guide, wishlist) ---------- */
+
+.site-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  background: rgba(19, 27, 46, 0.6);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5rem 1rem 1rem;
+  overflow-x: hidden;
+}
+.site-overlay.is-open { display: flex; }
+
+.site-modal-panel {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 60px rgba(19, 27, 46, 0.25);
+  width: 100%;
+  max-width: 34rem;
+  max-height: 85vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.5rem;
+}
+
+body.site-overlay-open {
+  overflow: hidden;
+}
+
+/* ---------- Generic option pill (product options rendered as type=radio) ---------- */
+
+.option-pill-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-accent);
+  display: none;
+}
+.option-pill:has(.option-pill-input:checked) {
+  border-color: var(--color-primary);
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary);
+}
+
+/* ---------- Star rating input (review form) ---------- */
+/*
+  Markup is DOM-reversed (radio 5, label 5, radio 4, label 4, ... radio 1,
+  label 1) inside a flex-row-reverse container, so it displays 1->5 left to
+  right while every label *after* a given input in DOM order is a *lower*
+  value star, i.e. one visually to its left. That lets a single ~ (general
+  sibling) selector fill "up to and including" the checked/hovered star with
+  no JS.
+*/
+.star-rating input:checked ~ label svg,
+.star-rating label:hover svg,
+.star-rating label:hover ~ label svg {
+  color: var(--color-accent);
+  fill: currentColor;
+}
+.star-rating input:focus-visible + label {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+/* ---------- Product page tabs (Description / Specification / Reviews) ---------- */
+/*
+  Bootstrap's tab.js toggles an "active" class on the closest <li> to the
+  clicked [data-toggle=tab] link (and shows/hides the matching .tab-pane) —
+  kept as-is since it's reliable and already wired up in product.twig. Only
+  the paint is replaced here, as plain unlayered CSS rather than Tailwind
+  utilities, consistent with how the cart-drawer/menu cascade issues above
+  were resolved.
+*/
+.tabs-underline {
+  display: flex;
+  gap: 1.75rem;
+  border-bottom: 1px solid var(--color-border);
+  margin: 2rem 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.tabs-underline > li {
+  margin: 0 0 -1px;
+}
+.tabs-underline > li > a {
+  display: block;
+  padding: 0 0 0.9rem;
+  font-family: var(--font-headline);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink-3);
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tabs-underline > li > a:hover {
+  color: var(--color-ink);
+}
+.tabs-underline > li > a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+.tabs-underline > li.active > a {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* ---------- Product gallery floating thumbnail strip ---------- */
+
+.product-gallery-thumb.is-active {
+  border-color: var(--color-primary) !important;
+  border-width: 2px !important;
+  transform: scale(1.05);
+}
+
+/* ---------- Brand/category carousel (extension/module/carousel) ---------- */
+/*
+  compat.css puts a bordered, rounded frame around every .swiper-viewport
+  (meant for image/banner sliders) and force-rounds every img inside it —
+  neither is wanted for a row of standalone brand cards, so both are reset
+  here, scoped to this module only.
+*/
+/* overflow:visible here (instead of the usual swiper overflow:hidden) let
+   off-screen loop-mode clone slides push past the page's own edge and
+   force a horizontal scrollbar on the whole site — clip it like every
+   other swiper, and give it a bit of vertical breathing room instead
+   (padding offset by a matching negative margin, so the box's own size is
+   unchanged) so the card hover lift/shadow isn't cut off top and bottom. */
+.brand-carousel.swiper-viewport { overflow: hidden; }
+.brand-carousel .swiper-container { border: none !important; border-radius: 0 !important; overflow: hidden; padding: 12px 0; margin: -12px 0; }
+.brand-carousel .swiper-slide { height: auto; align-items: stretch; }
+.brand-carousel img { border-radius: 0 !important; }
+
+.brand-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.75rem 1rem;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+a.brand-card:hover, a.brand-card:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px rgba(19, 27, 46, 0.1);
+  transform: translateY(-2px);
+  outline: none;
+}
+.brand-card-well {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+.brand-card-well img {
+  max-width: 62%;
+  max-height: 62%;
+  object-fit: contain;
+}
+.brand-card-name {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-ink);
+  text-align: center;
+}
+/* Cycled pastel tints for the image well, matching the reference design */
+.brand-tint-0 { background: #eef2ff; }
+.brand-tint-1 { background: #f5f3ff; }
+.brand-tint-2 { background: #fef2f2; }
+.brand-tint-3 { background: #ecfdf5; }
+
+/* ---------- Category page: subcategory/sort bar ---------- */
+/*
+  product/category.twig's full-width bar above the sidebar+grid row
+  (category__category-list previously lived inside the narrow #content
+  column; this reuses the same "All" + sibling-category pill pattern but
+  spans the whole page width, with sort moved into the same bar).
+*/
+.product-specify-bar {
+  align-items: end;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.1rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-ink-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.category-pill:hover { background: var(--color-surface-3); border-color: var(--color-primary); color: var(--color-primary); }
+.category-pill-active,
+.category-pill-active:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.category-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 0.4rem;
+  padding: 0 0.35rem;
+  border-radius: 9999px;
+  background: var(--color-surface-3);
+  color: var(--color-ink-3);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+.category-pill-active .category-pill-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* ---------- Long-form article body (blog/article.twig) ---------- */
+/*
+  The article description is raw operator-authored HTML straight out of
+  the DB (real content in this store uses p / h3 / hr / span / a), so the
+  elements can't carry utility classes — they need real element styling.
+  Tailwind's typography plugin isn't part of this build, so this is a
+  small hand-written prose layer instead.
+
+  Sizing is deliberately larger and looser than the theme's UI defaults:
+  1.0625rem/1.75 rather than the text-sm/leading-relaxed used for
+  interface copy. A reading surface is the one place where UI density is
+  the wrong target — pairs with the max-w-[68ch] measure on the wrapper
+  (~65-75 characters per line).
+*/
+.article-prose {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-ink-2);
+}
+.article-prose > :first-child { margin-top: 0; }
+.article-prose > :last-child { margin-bottom: 0; }
+.article-prose p { margin: 0 0 1.5em; }
+/* Lede: the opening paragraph reads as a standfirst, per editorial convention */
+.article-prose > p:first-of-type {
+  font-size: 1.1875rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+.article-prose h2,
+.article-prose h3,
+.article-prose h4 {
+  font-family: var(--font-headline);
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 2.25em 0 0.6em;
+}
+.article-prose h2 { font-size: 1.625rem; font-weight: 800; }
+.article-prose h3 { font-size: 1.3125rem; font-weight: 700; }
+.article-prose h4 { font-size: 1.0625rem; font-weight: 700; }
+.article-prose a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  transition: text-decoration-color 0.15s;
+}
+.article-prose a:hover { text-decoration-color: var(--color-primary); }
+.article-prose strong, .article-prose b { color: var(--color-ink); font-weight: 700; }
+.article-prose ul, .article-prose ol { margin: 0 0 1.5em; padding-left: 1.5em; }
+.article-prose ul { list-style: disc; }
+.article-prose ol { list-style: decimal; }
+.article-prose li { margin-bottom: 0.5em; }
+.article-prose li::marker { color: var(--color-ink-3); }
+.article-prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 2em auto;
+  border-radius: 0.75rem;
+}
+.article-prose figure { margin: 2em 0; }
+.article-prose figcaption {
+  margin-top: 0.75em;
+  font-size: 0.8125rem;
+  color: var(--color-ink-3);
+  text-align: center;
+}
+.article-prose blockquote {
+  margin: 2em 0;
+  padding: 0.25em 0 0.25em 1.25em;
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-ink);
+  font-size: 1.125rem;
+  font-style: italic;
+}
+.article-prose blockquote p:last-child { margin-bottom: 0; }
+.article-prose hr {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+.article-prose code {
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+  font-size: 0.9em;
+}
+.article-prose pre {
+  margin: 0 0 1.5em;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--color-ink);
+  color: #fff;
+  overflow-x: auto;
+}
+.article-prose pre code { padding: 0; background: none; color: inherit; }
+.article-prose table {
+  width: 100%;
+  margin: 0 0 1.5em;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+.article-prose th, .article-prose td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+.article-prose th { background: var(--color-surface-2); color: var(--color-ink); font-weight: 700; }
+
+/* ---------- Category nav: active link ---------- */
+/*
+  theme.js's markActiveNav() compares each link's resolved href to the
+  current URL and toggles "is-active" — server-rendered menu.twig has no
+  notion of "current category". Same visual treatment as the hover state
+  (border-b-2 border-primary, text-primary) so an active link simply looks
+  permanently hovered, in both the desktop bar (top-level and "..."
+  overflow entries) and the mobile panel.
+*/
+#site-nav .nav-item > a.is-active,
+#nav-more-panel a.is-active {
+  color: var(--color-primary) !important;
+}
+#site-nav .nav-item > a.is-active {
+  border-color: var(--color-primary) !important;
+}
+#nav-more > button.is-active {
+  color: var(--color-primary) !important;
+}
+#mobile-menu-panel a.is-active {
+  color: var(--color-primary) !important;
+  background-color: var(--color-surface-3) !important;
+}
+
+/* ============================================================
+   Hero module (Design > Hero Containers, placed via layout)
+   ============================================================
+   Mouse-driven parallax without WebGL: theme.js writes --hero-shift-x/-y
+   onto #hero{N} (the .hero-parallax root) on every animation frame — a
+   plain inherited CSS custom property, so the rule below just reads it —
+   no direct style.transform writes from JS, and the section still
+   renders correctly (just static) with JS off, prefers-reduced-motion,
+   or on touch devices where theme.js never sets the property at all.
+   Only the background media moves; .hero-parallax__content (text/buttons)
+   is deliberately static so copy stays put and legible. */
+
+.hero-parallax {
+  --hero-shift-x: 0px;
+  --hero-shift-y: 0px;
+}
+
+.hero-parallax__media {
+  transform: scale(1.08) translate3d(var(--hero-shift-x), var(--hero-shift-y), 0);
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
+.hero-parallax__media img {
+  transform: scale(1.02);
+}
+
+.hero-eyebrow {
+  color: var(--color-hero-eyebrow);
+}
+
+/* Ghost CTA: the primary CTA reuses .blue-gradient/.blue-gradient-hover
+   (theme.css) as-is; this is the one new button style hero needs — a
+   translucent white-bordered variant readable over a dark photo, which
+   compat.css's .btn-outline-primary (blue border/text) isn't. */
+.hero-cta {
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.hero-cta-primary {
+  color: #fff;
+}
+
+.hero-cta-primary:hover,
+.hero-cta-primary:focus {
+  color: #fff;
+}
+
+.hero-cta-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+
+.hero-cta-ghost:hover,
+.hero-cta-ghost:focus {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #fff;
+  color: #fff;
+}
+
+/* ---------- Accordion panels (panel-group/.accordion-toggle) ---------- */
+/*
+  Shared by every Bootstrap "panel-group" accordion in 2default: the
+  checkout flow (checkout.twig's numbered steps) and the cart page's
+  coupon/voucher/reward-points/shipping-estimate panels
+  (extension/total/*.twig). Gives every accordion-toggle link a real
+  clickable affordance (hover/focus, 44px touch target) and highlights
+  whichever panel is currently open, none of which compat.css's bare
+  Bootstrap reskin provides on its own.
+*/
+
+.panel-heading .accordion-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  color: var(--color-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.panel-heading .accordion-toggle:hover { color: var(--color-primary); }
+
+.panel-heading .accordion-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+.accordion-chevron {
+  color: var(--color-ink-3);
+  transition: transform 200ms ease;
+}
+
+.panel:has(.panel-collapse.in) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.panel:has(.panel-collapse.in) .accordion-chevron {
+  transform: rotate(180deg);
+}
+
+/* ---------- Checkout accordion steps (checkout.twig) ---------- */
+/*
+  checkout.twig's inline JS rewrites .panel-title's innerHTML per step (to
+  swap between a plain label and a clickable <a data-toggle="collapse">), so
+  the step-number badge lives as a sibling in .panel-heading rather than
+  inside .panel-title — it must survive those rewrites untouched.
+*/
+
+.checkout-step-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkout-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--color-surface-3);
+  color: var(--color-ink-3);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.checkout-step-heading .panel-title { flex: 1 1 auto; min-width: 0; }
+
+.checkout-step:has(.panel-collapse.in) .checkout-step-num {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* ---------- Form improvements for checkout flows ---------- */
+/*
+  Enhance Bootstrap form classes with 2default design tokens for better
+  visual hierarchy, spacing, and error feedback in checkout and guest forms.
+*/
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group.required .control-label:before {
+  margin-right: 0.25rem;
+}
+
+.control-label {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  font-size: 0.95rem;
+  padding: 0.6rem 0.9rem;
+  height: 2.8rem;
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.help-block {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.has-error .control-label {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.has-error .form-control {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 5%, #fff);
+}
+
+.has-error .form-control:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 15%, transparent);
+}
+
+div.text-danger,
+.form-group > .text-danger {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-danger);
+}
+
+.radio, .checkbox {
+  padding-left: 1.8rem;
+  margin: 0.6rem 0;
+}
+
+.radio input, .checkbox input {
+  top: 0.25rem;
+}
+
+.radio label, .checkbox label {
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+input[type="checkbox"]:not(.option-pill-input),
+input[type="radio"]:not(.option-pill-input) {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-width: 1.5px;
+}
+
+/* Fieldset + legend base styling moved to @layer base in theme.css */
+
+/* ---------- Breadcrumb link colors ---------- */
+nav[aria-label="Breadcrumb"] a,
+.breadcrumb > li a {
+  color: var(--color-ink-3);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+nav[aria-label="Breadcrumb"] a:hover,
+.breadcrumb > li a:hover {
+  color: var(--color-primary);
+}
+.breadcrumb > li:last-child a,
+.breadcrumb > li:last-child span {
+  color: var(--color-primary);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+/* ---------- Account quick-nav pills (account.twig) ---------- */
+/*
+  Replaces the stock account dashboard's stacked h2 + ul.list-unstyled link
+  groups (My Account / My Orders / My Affiliate / My Newsletter) with one
+  flat row of outlined pill links, so every account sub-page is reachable
+  in a single glance instead of scrolling a vertical list.
+*/
+
+.account-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
+  text-decoration: none;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+}
+
+.account-pill svg { color: var(--color-icon); transition: color 150ms ease; }
+
+.account-pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-surface);
+  text-decoration: none;
+}
+
+.account-pill:hover svg { color: var(--color-primary); }
+
+.account-pill:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Distinct style for logout / destructive action pill */
+.account-pill-danger {
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 4%, #fff);
+}
+
+.account-pill-danger svg {
+  color: var(--color-danger);
+}
+
+.account-pill-danger:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, #fff);
+  text-decoration: none;
+}
+
+.account-pill-danger:hover svg {
+  color: var(--color-danger);
+}
+
+.account-pill-danger:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 2px;
+}
+
+/* ---------- Icon-prefixed form fields (login.twig, register.twig) ---------- */
+
+.form-control-icon-wrap { position: relative; }
+
+.form-control-icon-wrap > svg {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-icon);
+  pointer-events: none;
+}
+
+.form-control-icon-wrap > .form-control { padding-left: 2.5rem; }
+
+.form-control-icon-wrap > .form-control-toggle {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  color: var(--color-icon);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.form-control-icon-wrap > .form-control-toggle:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-3);
+}
+
+.form-control-icon-wrap:has(.form-control-toggle) > .form-control { padding-right: 2.5rem; }

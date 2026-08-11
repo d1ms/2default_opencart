@@ -1,0 +1,68 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="common-success" class="container-app py-6 md:py-12">
+
+  <nav aria-label="Breadcrumb" class="flex text-xs font-semibold text-ink-3 mb-6">
+    <ol class="inline-flex items-center flex-wrap gap-1">
+      {% for breadcrumb in breadcrumbs %}
+      {% if not loop.last %}
+      <li><a href="{{ breadcrumb.href }}" class="hover:text-primary no-underline">{{ breadcrumb.text }}</a></li>
+      <li><span class="mx-1 text-border">/</span></li>
+      {% else %}
+      <li><span class="text-primary font-bold">{{ breadcrumb.text }}</span></li>
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+
+      <div class="flex flex-col items-center justify-center py-8 md:py-16">
+        <!-- Success Icon -->
+        <div class="mb-6 flex items-center justify-center">
+          <div class="relative">
+            <div class="absolute inset-0 bg-primary/10 rounded-full scale-150 animate-pulse"></div>
+            <div class="relative w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              {{ ic.icon('check-circle', 'w-10 h-10 text-white') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Message Block -->
+        <div class="text-center max-w-md w-full mb-8">
+          <h1 class="font-headline text-2xl sm:text-3xl font-extrabold text-ink mb-3">{{ heading_title }}</h1>
+
+          <div class="rounded-2xl border border-border/40 bg-white p-6 md:p-8">
+            <div class="flex items-start gap-3 mb-4">
+              {{ ic.icon('check-circle', 'w-5 h-5 text-green-600 shrink-0 mt-0.5') }}
+              <div class="text-sm text-ink-2 leading-relaxed text-center">
+                {{ text_message }}
+              </div>
+            </div>
+            <p class="text-xs text-ink-3 italic">{{ text_success }}</p>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <a href="{{ continue }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors no-underline">
+          {{ ic.icon('arrow-right', 'w-4 h-4') }} {{ button_continue }}
+        </a>
+      </div>
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

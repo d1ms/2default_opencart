@@ -1,0 +1,266 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+{#
+  Blog article. Deliberately NOT built on product/product.twig's layout:
+  a product page optimises for a buy box (image well + sticky purchase
+  column), an article optimises for reading. So this is a single centred
+  editorial column — a constrained ~68ch measure for the body copy
+  (65-75 chars is the readability target; full-width prose on desktop is
+  the thing to avoid), a wide hero image, and full-bleed related grids
+  below the article proper.
+#}
+<div id="blog-article" class="container-app py-6 md:py-12">
+
+  <nav aria-label="Breadcrumb" class="flex text-xs font-semibold text-ink-3 mb-8">
+    <ol class="inline-flex items-center flex-wrap gap-1">
+      {% for breadcrumb in breadcrumbs %}
+      {% if not loop.last %}
+      <li><a href="{{ breadcrumb.href }}" class="text-ink-3 hover:text-primary no-underline">{{ breadcrumb.text }}</a></li>
+      <li><span class="mx-1 text-border">/</span></li>
+      {% else %}
+      <li><span class="text-primary font-bold">{{ breadcrumb.text }}</span></li>
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set outer_class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set outer_class = 'col-sm-9' %}
+    {% else %}
+    {% set outer_class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ outer_class }}">
+      {{ content_top }}
+
+      <article>
+
+        {# ---------- Masthead ---------- #}
+        <header class="max-w-3xl mx-auto text-center">
+          {% if breadcrumbs|length > 1 %}
+          {% set section = breadcrumbs[breadcrumbs|length - 2] %}
+          <a href="{{ section.href }}" class="inline-block mb-4 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider no-underline hover:bg-primary/15 transition-colors">{{ section.text }}</a>
+          {% endif %}
+
+          <h1 class="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink tracking-tight text-balance">{{ heading_title }}</h1>
+
+          {% if review_status %}
+          <div class="mt-5 flex items-center justify-center gap-2">
+            <div class="rating flex items-center gap-0.5" aria-hidden="true">
+              {% for i in 1..5 %}
+              {{ ic.icon('star', 'w-4 h-4 ' ~ (i <= rating ? 'text-accent fill-current' : 'text-border')) }}
+              {% endfor %}
+            </div>
+            <a href="#article-reviews" class="text-xs font-semibold text-ink-3 no-underline hover:text-primary">{{ reviews }}</a>
+          </div>
+          {% endif %}
+        </header>
+
+        {# ---------- Hero image (+ any extra images, as one lightbox gallery) ---------- #}
+        {% if thumb or images %}
+        {# Narrower than the 68ch body measure on purpose: the hero reads as
+           a figure belonging to the column rather than a full-bleed banner.
+           It also keeps the image honest — the controller resizes this thumb
+           to 200x300, so a wide hero was upscaling it several times over. #}
+        {# The margin utilities need "!": compat.css's .thumbnails sets
+           margin:-0.5rem as a plain unlayered rule, which outranks
+           Tailwind's layered utilities in this build and was pulling the
+           hero off the column's centre axis. Same reason !p-0/!list-none
+           are here. #}
+        <ul class="thumbnails max-w-sm !mx-auto !mt-10 !mb-12 !p-0 !list-none flex flex-wrap justify-center gap-3">
+          {% if thumb %}
+          <li class="w-full !m-0">
+            <a class="thumbnail block w-full aspect-video rounded-2xl overflow-hidden bg-surface-2 border border-black/5 shadow-sm" href="{{ popup }}" title="{{ heading_title }}">
+              <img src="{{ thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" class="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-700 ease-out">
+            </a>
+          </li>
+          {% endif %}
+          {% for image in images %}
+          <li class="image-additional !m-0">
+            <a class="thumbnail block w-20 h-20 rounded-xl overflow-hidden bg-surface-2 border border-border/50 hover:border-primary transition-colors" href="{{ image.popup }}" title="{{ heading_title }}">
+              <img src="{{ image.thumb }}" title="{{ heading_title }}" alt="{{ heading_title }}" class="w-full h-full object-cover">
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
+        {# ---------- Body ---------- #}
+        <div class="article-prose max-w-[68ch] mx-auto">{{ description }}</div>
+
+        {# ---------- Attachments ---------- #}
+        {% if download_status and downloads %}
+        <div class="max-w-[68ch] mx-auto mt-12 rounded-2xl border border-border/40 bg-white p-5">
+          <h2 class="font-headline text-sm font-bold text-ink uppercase tracking-wide mb-3">{{ text_download|default('Downloads') }}</h2>
+          <ul class="!p-0 !list-none space-y-1">
+            {% for download in downloads %}
+            <li class="!m-0">
+              <a href="{{ download.href }}" class="flex items-center gap-2.5 -mx-2 px-2 py-2 rounded-lg text-sm font-semibold text-ink hover:bg-surface-3 hover:text-primary no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                {{ ic.icon('upload', 'w-4 h-4 shrink-0 text-ink-3') }}
+                <span class="truncate">{{ download.name }}</span>
+                <span class="ml-auto shrink-0 text-xs font-normal text-ink-3">{{ download.size }}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {# ---------- Reviews ---------- #}
+        {% if review_status %}
+        <section id="article-reviews" class="max-w-[68ch] mx-auto mt-14 pt-10 border-t border-border/60">
+          <h2 class="font-headline text-xl font-bold text-ink mb-5">{{ reviews }}</h2>
+
+          <div id="review"></div>
+
+          <div class="mt-8 rounded-2xl border border-border/40 bg-white p-5 md:p-6">
+            <h3 class="font-headline text-lg font-bold text-ink mb-5">{{ text_write }}</h3>
+            <form id="form-review" class="flex flex-col gap-5">
+              {% if review_guest %}
+              <div class="form-group required">
+                <label class="control-label !p-0 !mb-2 block" for="input-name">{{ entry_name }}</label>
+                <div class="relative">
+                  {{ ic.icon('user', 'w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-icon pointer-events-none') }}
+                  <input type="text" name="name" value="{{ customer_name }}" id="input-name" placeholder="{{ entry_name }}" class="form-control !pl-10">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="control-label !p-0 !mb-2 block" for="input-review">{{ entry_review }}</label>
+                <div class="relative">
+                  {{ ic.icon('message-square', 'w-4 h-4 absolute left-3.5 top-3.5 text-icon pointer-events-none') }}
+                  <textarea name="text" rows="5" id="input-review" placeholder="{{ entry_review }}" class="form-control !pl-10"></textarea>
+                </div>
+                <div class="help-block">{{ text_note }}</div>
+              </div>
+              <div class="form-group required">
+                <label class="control-label !p-0 !mb-2 block">{{ entry_rating }}</label>
+                <div class="flex items-center gap-4 flex-wrap mt-1">
+                  <span class="text-xs text-ink-3 font-semibold">{{ entry_bad }}</span>
+                  {# Star rating: DOM order is 5,4,3,2,1 with flex-row-reverse
+                     so it *displays* 1->5 left to right. That means every
+                     label after the checked/hovered one in DOM is a *lower*
+                     value, i.e. a star visually to its left — so a plain
+                     ~ (general sibling) selector in components.css is
+                     enough to fill "up to and including" the chosen star,
+                     with no JS. #}
+                  <div class="star-rating flex flex-row-reverse items-center gap-0.5" role="radiogroup" aria-label="{{ entry_rating }}">
+                    {% for i in [5,4,3,2,1] %}
+                    <input type="radio" name="rating" value="{{ i }}" id="input-rating-{{ i }}" class="sr-only">
+                    <label for="input-rating-{{ i }}" class="star-rating-item p-0.5 rounded-full cursor-pointer" aria-label="{{ i }} / 5">
+                      {{ ic.icon('star', 'w-6 h-6 text-border transition-colors') }}
+                    </label>
+                    {% endfor %}
+                  </div>
+                  <span class="text-xs text-ink-3 font-semibold">{{ entry_good }}</span>
+                </div>
+              </div>
+              {{ captcha }}
+              <div class="flex items-center justify-end gap-4 flex-wrap pt-4 border-t border-border/40">
+                {% if text_agree %}
+                <label class="flex items-center gap-2 text-sm text-ink-2 mr-auto">
+                  {% if agree %}
+                  <input type="checkbox" name="agree" value="1" checked="checked">
+                  {% else %}
+                  <input type="checkbox" name="agree" value="1">
+                  {% endif %}
+                  {{ text_agree }}
+                </label>
+                {% endif %}
+                <button type="button" id="button-review" data-loading-text="{{ text_loading }}" class="btn btn-outline-primary flex items-center gap-2">{{ ic.icon('send', 'w-4 h-4') }} {{ button_continue }}</button>
+              </div>
+              {% else %}
+              {{ text_login }}
+              {% endif %}
+            </form>
+          </div>
+        </section>
+        {% endif %}
+      </article>
+
+      {# ---------- Related, full content width ---------- #}
+      {% if articles %}
+      <div class="mt-16 md:mt-20 pt-10 border-t border-border/60">
+        <h2 class="font-headline text-2xl md:text-3xl font-bold text-ink mb-6">{{ text_related }}</h2>
+        <div class="article-card-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {% for article in articles %}
+          {% include '2default/template/common/article_thumb.twig' with {'article': article} %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if products %}
+      <div class="mt-16 md:mt-20">
+        <h2 class="font-headline text-2xl md:text-3xl font-bold text-ink mb-6">{{ text_related_product }}</h2>
+        <div class="product-card-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+          {% for product in products %}
+          {% include '2default/template/common/product_thumb.twig' with {'product': product} %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$('#review').delegate('.pagination a', 'click', function(e) {
+    e.preventDefault();
+
+    $('#review').fadeOut('slow');
+
+    $('#review').load(this.href);
+
+    $('#review').fadeIn('slow');
+});
+
+$('#review').load('index.php?route=blog/article/review&article_id={{ article_id }}');
+
+$('#button-review').on('click', function() {
+	$.ajax({
+		url: 'index.php?route=blog/article/write&article_id={{ article_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: $("#form-review").serialize(),
+		beforeSend: function() {
+			$('#button-review').button('loading');
+		},
+		complete: function() {
+			$('#button-review').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#review').after('<div class="alert alert-danger alert-dismissible"><svg class="w-4 h-4 shrink-0 inline" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="catalog/view/theme/2default/js/icons.svg#icon-alert-circle"></use></svg> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+				$('#review').after('<div class="alert alert-success alert-dismissible"><svg class="w-4 h-4 shrink-0 inline" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="catalog/view/theme/2default/js/icons.svg#icon-check-circle"></use></svg> ' + json['success'] + '</div>');
+
+				$('input[name=\'name\']').val('');
+				$('textarea[name=\'text\']').val('');
+				$('input[name=\'rating\']:checked').prop('checked', false);
+			}
+		}
+	});
+});
+
+$(document).ready(function() {
+	$('.thumbnails').magnificPopup({
+		type:'image',
+		delegate: 'a',
+		gallery: {
+			enabled: true
+		}
+	});
+});
+//--></script>
+{{ footer }}

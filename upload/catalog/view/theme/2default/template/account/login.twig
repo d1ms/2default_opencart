@@ -1,0 +1,70 @@
+{{ header }}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="account-login" class="container-app py-8 md:py-12">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+  {% if success %}
+  <div class="alert alert-success alert-dismissible">{{ ic.icon('check-circle', 'w-4 h-4 inline -mt-0.5') }} {{ success }}</div>
+  {% endif %}
+  {% if error_warning %}
+  <div class="alert alert-danger alert-dismissible">{{ ic.icon('alert-circle', 'w-4 h-4 inline -mt-0.5') }} {{ error_warning }}</div>
+  {% endif %}
+
+  <div class="row">
+    {{ column_left }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+
+    <div id="content" class="{{ class }}">
+      {{ content_top }}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="bg-white rounded-2xl border border-border/40 p-6 md:p-8 flex flex-col">
+          <h2 class="font-headline text-xl font-bold text-ink mb-2">{{ text_new_customer }}</h2>
+          <p class="text-sm font-semibold text-ink mb-1">{{ text_register }}</p>
+          <p class="text-sm text-ink-2 flex-grow">{{ text_register_account }}</p>
+          <a href="{{ register }}" class="btn btn-default mt-4 self-start">{{ button_continue }}</a>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-border/40 p-6 md:p-8">
+          <h2 class="font-headline text-xl font-bold text-ink mb-2">{{ text_returning_customer }}</h2>
+          <p class="text-sm font-semibold text-ink mb-4">{{ text_i_am_returning_customer }}</p>
+          <form action="{{ action }}" method="post" enctype="multipart/form-data" class="space-y-4">
+            <div class="form-group">
+              <label class="control-label" for="input-email">{{ entry_email }}</label>
+              <div class="form-control-icon-wrap">
+                {{ ic.icon('mail', 'w-4 h-4') }}
+                <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="input-email" class="form-control">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label" for="input-password">{{ entry_password }}</label>
+              <div class="form-control-icon-wrap">
+                {{ ic.icon('shield-check', 'w-4 h-4') }}
+                <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" id="input-password" class="form-control">
+                <button type="button" class="form-control-toggle" aria-pressed="false" aria-label="{{ entry_password }}" data-toggle="tooltip" title="{{ entry_password }}">{{ ic.icon('eye', 'w-4 h-4') }}</button>
+              </div>
+              <a href="{{ forgotten }}" class="text-xs text-primary no-underline hover:underline mt-1 inline-block">{{ text_forgotten }}</a>
+            </div>
+            <input type="submit" value="{{ button_login }}" class="btn btn-primary">
+            {% if redirect %}
+            <input type="hidden" name="redirect" value="{{ redirect }}">
+            {% endif %}
+          </form>
+        </div>
+
+      </div>
+      {{ content_bottom }}
+    </div>
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

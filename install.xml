@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>2default Theme</name>
+  <code>2default</code>
+  <version>1.0.0</version>
+  <author>2default</author>
+  <link>https://opencart3.test</link>
+  <description>
+    Core-file changes required by the 2default theme (cart AJAX quantity
+    updates, the header cart-count badge, and a couple of missing language
+    strings), applied through OpenCart's own modification system instead
+    of hand-edited core files, so the theme installs cleanly on a stock
+    OpenCart 3.0.4.4 store. Auto-loaded from system/*.ocmod.xml on every
+    Extensions > Modifications > Refresh.
+  </description>
+
+  <!-- checkout/cart.php: edit() only ever handled the classic full-cart-page
+       form shape (quantity[cart_id] per row, unconditional redirect on
+       success). common.js's own cart.update(key, quantity) AJAX helper
+       posts a flat key+quantity pair instead, which fell through into that
+       branch's is_array() assumption and then redirected into a full HTML
+       page instead of returning JSON. -->
+  <file path="catalog/controller/checkout/cart.php">
+    <operation>
+      <search index="0"><![CDATA[// Update]]></search>
+      <add position="replace"><![CDATA[// Update (classic full cart page form: one quantity[cart_id] field per row)]]></add>
+    </operation>
+    <operation>
+      <search index="0"><![CDATA[if (!empty($this->request->post['quantity'])) {]]></search>
+      <add position="replace"><![CDATA[if (!empty($this->request->post['quantity']) && is_array($this->request->post['quantity'])) {]]></add>
+    </operation>
+    <operation>
+      <search index="0"><![CDATA[$this->response->redirect($this->url->link('checkout/cart'));]]></search>
+      <add position="after" offset="1"><![CDATA[
+		// Update (AJAX: a single key + quantity, e.g. the cart drawer's +/-
+		// stepper via common.js's cart.update(key, quantity)). The array
+		// form above always redirects back to the full cart page — no good
+		// for an AJAX caller — so this shape returns JSON instead, mirroring
+		// add()/remove() below.
+		if (isset($this->request->post['key']) && isset($this->request->post['quantity']) && !is_array($this->request->post['quantity'])) {
+			$quantity = (int)$this->request->post['quantity'];
+
+			if ($quantity > 0) {
+				$this->cart->update($this->request->post['key'], $quantity);
+			} else {
+				$this->cart->remove($this->request->post['key']);
+			}
+
+			$json['success'] = $this->language->get('text_remove');
+
+			unset($this->session->data['shipping_method']);
+			unset($this->session->data['shipping_methods']);
+			unset($this->session->data['payment_method']);
+			unset($this->session->data['payment_methods']);
+			unset($this->session->data['reward']);
+
+			// Totals
+			$this->load->model('setting/extension');
+
+			$totals = array();
+			$taxes = $this->cart->getTaxes();
+			$total = 0;
+
+			// Because __call can not keep var references so we put them into an array.
+			$total_data = array(
+				'totals' => &$totals,
+				'taxes'  => &$taxes,
+				'total'  => &$total
+			);
+
+			// Display prices
+			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+				$sort_order = array();
+
+				$results = $this->model_setting_extension->getExtensions('total');
+
+				foreach ($results as $key => $value) {
+					$sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
+				}
+
+				array_multisort($sort_order, SORT_ASC, $results);
+
+				foreach ($results as $result) {
+					if ($this->config->get('total_' . $result['code'] . '_status')) {
+						$this->load->model('extension/total/' . $result['code']);
+
+						// We have to put the totals in an array so that they pass by reference.
+						$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
+					}
+				}
+
+				$sort_order = array();
+
+				foreach ($totals as $key => $value) {
+					$sort_order[$key] = $value['sort_order'];
+				}
+
+				array_multisort($sort_order, SORT_ASC, $totals);
+			}
+
+			$json['total'] = sprintf($this->language->get('text_items'), $this->cart->countProducts() + (isset($this->session->data['vouchers']) ? count($this->session->data['vouchers']) : 0), $this->currency->format($total, $this->session->data['currency']));
+		}]]></add>
+    </operation>
+  </file>
+
+  <!-- common/cart.php: expose the raw item count so the header cart button
+       (2default/template/common/cart.twig) can render its badge on first
+       page load, not just after an AJAX round trip. -->
+  <file path="catalog/controller/common/cart.php">
+    <operation>
+      <search index="0"><![CDATA[$data['text_items'] = sprintf($this->language->get('text_items'), $this->cart->countProducts() + (isset($this->session->data['vouchers']) ? count($this->session->data['vouchers']) : 0), $this->currency->format($total, $this->session->data['currency']));]]></search>
+      <add position="replace"><![CDATA[$cart_count = $this->cart->countProducts() + (isset($this->session->data['vouchers']) ? count($this->session->data['vouchers']) : 0);
+
+		$data['text_items'] = sprintf($this->language->get('text_items'), $cart_count, $this->currency->format($total, $this->session->data['currency']));
+		$data['cart_count'] = $cart_count;]]></add>
+    </operation>
+  </file>
+
+  <!-- Cart drawer heading ("Cart (N)") needs a plain noun, not the
+       existing text_cart ("View Cart"), which is a link label. -->
+  <file path="catalog/language/en-gb/common/cart.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_cart']      = 'View Cart';]]></search>
+      <add position="after"><![CDATA[$_['text_cart_heading'] = 'Cart';]]></add>
+    </operation>
+  </file>
+  <file path="catalog/language/ru-ru/common/cart.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_cart']      = 'Посмотреть корзину';]]></search>
+      <add position="after"><![CDATA[$_['text_cart_heading'] = 'Корзина';]]></add>
+    </operation>
+  </file>
+
+  <!-- Subcategory/sort bar (product/category.twig) needs an "All" pill
+       label and a proper bar heading; the existing text_refine reads
+       oddly used that way ("Refine Search" / "Choose a subcategory"). -->
+  <file path="catalog/language/en-gb/product/category.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_refine']       = 'Refine Search';]]></search>
+      <add position="after"><![CDATA[$_['text_subcategories'] = 'Subcategories:';
+$_['text_all']          = 'All';]]></add>
+    </operation>
+  </file>
+  <file path="catalog/language/ru-ru/product/category.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_refine'] = 'Выберите подкатегорию';]]></search>
+      <add position="after"><![CDATA[$_['text_subcategories'] = 'Подкатегории:';
+$_['text_all'] = 'Все';]]></add>
+    </operation>
+  </file>
+
+  <!-- extension/module/category.php (sidebar category tree): the stock
+       controller only ever baked the product count into the name string
+       ("Running (12)"), which can't be styled as a separate badge.
+       Split it into its own 'count' field instead, and pass heading_title
+       through — the language file defines it but the controller never
+       actually set $data['heading_title']. -->
+  <file path="catalog/controller/extension/module/category.php">
+    <operation>
+      <search index="0"><![CDATA['name' => $child['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),]]></search>
+      <add position="replace"><![CDATA['name' => $child['name'],
+						'count' => $this->config->get('config_product_count') ? $this->model_catalog_product->getTotalProducts($filter_data) : null,]]></add>
+    </operation>
+    <operation>
+      <search index="0"><![CDATA['name'        => $category['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),]]></search>
+      <add position="replace"><![CDATA['name'        => $category['name'],
+				'count'       => $this->config->get('config_product_count') ? $this->model_catalog_product->getTotalProducts($filter_data) : null,]]></add>
+    </operation>
+    <operation>
+      <search index="0"><![CDATA[return $this->load->view('extension/module/category', $data);]]></search>
+      <add position="before"><![CDATA[		$data['heading_title'] = $this->language->get('heading_title');
+]]></add>
+    </operation>
+  </file>
+
+  <!-- product/category.php: same "count baked into name" problem as
+       extension/module/category.php, but for the top subcategory bar's
+       pills (product/category.twig). Split into a 'count' field, and
+       expose the current page's own product total (already computed for
+       pagination) as category_total so the "All" pill can carry a badge
+       too. -->
+  <file path="catalog/controller/product/category.php">
+    <operation>
+      <search index="0"><![CDATA['name' => $result['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),]]></search>
+      <add position="replace"><![CDATA['name' => $result['name'],
+						'count' => $this->config->get('config_product_count') ? $this->model_catalog_product->getTotalProducts($filter_data) : null,]]></add>
+    </operation>
+    <operation>
+      <search index="0"><![CDATA[$product_total = $this->model_catalog_product->getTotalProducts($filter_data);]]></search>
+      <add position="after"><![CDATA[			$data['category_total'] = $product_total;]]></add>
+    </operation>
+  </file>
+
+  <!-- extension/module/blog_category.php (blog sidebar category tree): same
+       "count baked into name" problem as extension/module/category.php,
+       fixed the same way (split into a 'count' field for a badge). Unlike
+       that module, this controller already sets $data['heading_title']
+       itself, so no equivalent fix is needed here. -->
+  <file path="catalog/controller/extension/module/blog_category.php">
+    <operation>
+      <search index="0"><![CDATA['name' => $child['name'] . ($this->config->get('configblog_article_count') ? ' (' . $this->model_blog_article->getTotalArticles($filter_data) . ')' : ''),]]></search>
+      <add position="replace"><![CDATA['name' => $child['name'],
+						'count' => $this->config->get('configblog_article_count') ? $this->model_blog_article->getTotalArticles($filter_data) : null,]]></add>
+    </operation>
+    <operation>
+      <search index="0"><![CDATA['name'        => $category['name'] . ($this->config->get('configblog_article_count') ? ' (' . $this->model_blog_article->getTotalArticles($filter_data) . ')' : ''),]]></search>
+      <add position="replace"><![CDATA['name'        => $category['name'],
+				'count'       => $this->config->get('configblog_article_count') ? $this->model_blog_article->getTotalArticles($filter_data) : null,]]></add>
+    </operation>
+  </file>
+
+  <!-- common/success.twig (contact form success page) needs a supportive
+       subtitle message: "Your message has been received. We will get back to
+       you as soon as possible." This is added via language file instead of
+       hardcoding in the template. -->
+  <file path="catalog/language/en-gb/information/contact.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_message']   = '<p>Your enquiry has been successfully sent to the store owner!</p>';]]></search>
+      <add position="after"><![CDATA[$_['text_success']   = 'Your message has been received. We will get back to you as soon as possible.';]]></add>
+    </operation>
+  </file>
+  <file path="catalog/language/ru-ru/information/contact.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_message']   = '<p>Ваш запрос был успешно отправлен администрации магазина!</p>';]]></search>
+      <add position="after"><![CDATA[$_['text_success']   = 'Ваше сообщение получено. Мы свяжемся с вами в ближайшее время.';]]></add>
+    </operation>
+  </file>
+
+  <!-- Design > Hero Containers admin menu link. The Hero extension
+       (admin/controller/design/hero.php, admin/controller/extension/module/hero.php)
+       ships as plain new files with no core edits of its own — this is the
+       one piece that unavoidably touches a stock file, since the sidebar
+       menu is hardcoded in column_left.php. Inserted right after the
+       existing Banner entry, same hasPermission-gated pattern.
+
+       IMPORTANT: OCMOD's non-regex <search> only ever matches a single
+       physical LINE (admin/controller/marketplace/modification.php explodes
+       the target file on "\n" and does stripos() per line) — a multi-line
+       CDATA search, as this operation originally used, can never match
+       anything and silently no-ops ("NOT FOUND - OPERATIONS ABORTED!" in
+       storage/logs/ocmod.log). Anchored instead on the single unique
+       'href' line inside the Banner block, then position="after"
+       offset="3" to land after that block's closing "}" (href is 3 lines
+       above the brace: children-array line, ");", "}"). -->
+  <file path="admin/controller/common/column_left.php">
+    <operation>
+      <search index="0"><![CDATA['href'     => $this->url->link('design/banner', 'user_token=' . $this->session->data['user_token'], true),]]></search>
+      <add position="after" offset="3"><![CDATA[
+
+			if ($this->user->hasPermission('access', 'design/hero')) {
+				$design[] = array(
+					'name'	   => $this->language->get('text_hero'),
+					'href'     => $this->url->link('design/hero', 'user_token=' . $this->session->data['user_token'], true),
+					'children' => array()
+				);
+			}]]></add>
+    </operation>
+  </file>
+  <file path="admin/language/en-gb/common/column_left.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_banner'] = 'Banners';]]></search>
+      <add position="after"><![CDATA[
+$_['text_hero'] = 'Promo Blocks';]]></add>
+    </operation>
+  </file>
+  <file path="admin/language/ru-ru/common/column_left.php">
+    <operation>
+      <search index="0"><![CDATA[$_['text_banner'] = 'Баннеры';]]></search>
+      <add position="after"><![CDATA[
+$_['text_hero'] = 'Промо-блоки';]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/controller/common/header.php">
+    <operation>
+      <search index="0"><![CDATA[$data['styles'] = $this->document->getStyles();]]></search>
+      <add position="after"><![CDATA[
+		// 2default Theme: CSS Color Custom Properties
+		$colors = array(
+			'color_primary'       => '#004ac6',
+			'color_primary_hover' => '#003ea8',
+			'color_accent'        => '#2563eb',
+			'color_accent_hover'  => '#1d4ed8',
+			'color_surface'       => '#faf8ff',
+			'color_surface_2'     => '#f2f3ff',
+			'color_surface_3'     => '#eaedff',
+			'color_header_bg'     => 'rgba(250, 248, 255, 0.9)',
+			'color_border'        => '#c3c6d7',
+			'color_ink'           => '#131b2e',
+			'color_ink_2'         => '#434655',
+			'color_icon'          => '#505f76'
+		);
+
+		$css_vars = array();
+		foreach ($colors as $key => $default) {
+			$val = $this->config->get('theme_2default_' . $key);
+			if (!$val) {
+				$val = $default;
+			}
+			$var_name = '--' . str_replace('_', '-', $key);
+			$css_vars[] = $var_name . ': ' . $val . ';';
+		}
+
+		$data['theme_2default_colors_css'] = implode("\n    ", $css_vars);
+]]></add>
+    </operation>
+  </file>
+</modification>

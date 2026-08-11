@@ -1,0 +1,122 @@
+{#
+  #cart keeps the exact DOM contract catalog/view/javascript/common.js expects:
+  a <button> as the first direct child (cart.add/update/remove call
+  $('#cart > button').button('loading'/'reset') and overwrite its innerHTML
+  with a hardcoded "<span id="cart-total"><i class="fa fa-shopping-cart">...
+  after every AJAX call), and a <ul> as the second direct child
+  (cart.add/update/remove call $('#cart > ul').load('...ul li') to refresh it).
+  The <button> stays a small pill in the header; the <ul> is repositioned into
+  a full-height drawer purely with CSS. #cart doubles as a Bootstrap
+  data-toggle="dropdown" trigger so open/close, outside-click-to-close and
+  Escape are handled by the already-loaded bootstrap.min.js — no custom JS
+  needed for the drawer mechanics themselves. theme.js's syncCartButton()
+  rebuilds the button back to the icon+badge markup below (common.js's own
+  overwrite only knows FA-icon + text) after every AJAX call — see theme.js.
+#}
+{% import '2default/template/common/icon.twig' as ic %}
+<div id="cart" class="dropdown relative">
+  <button type="button" data-toggle="dropdown" data-loading-text="{{ text_loading }}" title="{{ text_cart }}"
+          class="relative flex items-center justify-center p-2.5 rounded-full bg-surface-2 text-icon hover:bg-accent/10 hover:text-accent transition-colors">
+    {{ ic.icon('shopping-bag', 'w-5 h-5') }}
+    <span id="cart-total" class="cart-badge{% if cart_count == 0 %} is-hidden{% endif %}">{{ cart_count }}</span>
+  </button>
+
+  <ul class="cart-drawer-list dropdown-menu">
+
+    {# ── Sticky header row with title + close button ── #}
+    <li class="cart-drawer-header" onclick="event.stopPropagation()">
+      <span class="cart-drawer-header-title">
+        {{ ic.icon('shopping-bag', 'w-5 h-5 text-accent') }}
+        {{ text_cart_heading|default('Cart') }} ({{ cart_count }})
+      </span>
+      <button type="button" class="cart-drawer-close" title="{{ button_remove|default('Close') }}"
+              onclick="$('#cart > button').dropdown('toggle'); return false;">
+        {{ ic.icon('x', 'w-5 h-5') }}
+      </button>
+    </li>
+
+    {# ── Scrollable body ── #}
+    <li class="cart-drawer-body">
+      {% if products or vouchers %}
+      {% for product in products %}
+      <div class="cart-drawer-item relative group">
+        <div class="flex gap-4 p-4 rounded-2xl bg-surface/80 border border-border/40">
+          {% if product.thumb %}
+          <a href="{{ product.href }}" class="shrink-0"><img src="{{ product.thumb }}" alt="{{ product.name }}" class="w-20 h-20 object-contain rounded-xl bg-white p-2 border border-border/40"></a>
+          {% endif %}
+          <div class="flex-1 min-w-0 space-y-1">
+            <a href="{{ product.href }}" class="block font-headline font-extrabold text-sm text-ink hover:text-primary no-underline truncate">{{ product.name }}</a>
+            {% if product.option %}
+            <p class="text-xs text-ink-3 font-medium">
+              {% for option in product.option %}{% if not loop.first %} &bull; {% endif %}{{ option.name }}: <span class="text-ink-2 font-bold">{{ option.value }}</span>{% endfor %}
+            </p>
+            {% endif %}
+            {% if product.recurring %}
+            <p class="text-xs text-ink-3">{{ text_recurring }} {{ product.recurring }}</p>
+            {% endif %}
+            <div class="pt-1 flex items-center justify-between">
+              <span class="font-black text-ink text-sm">{{ product.total }}</span>
+
+              <div class="flex items-center gap-2 bg-white px-2 py-1 rounded-full border border-border">
+                {% if product.quantity > 1 %}
+                <button type="button" onclick="cart.update('{{ product.cart_id }}', {{ product.quantity - 1 }});" title="{{ text_remove_one|default('-') }}" class="w-5 h-5 rounded-full text-ink-2 hover:bg-surface-3 flex items-center justify-center">
+                  {{ ic.icon('minus', 'w-3 h-3') }}
+                </button>
+                {% else %}
+                <button type="button" onclick="cart.remove('{{ product.cart_id }}');" title="{{ button_remove }}" class="w-5 h-5 rounded-full text-ink-2 hover:bg-surface-3 flex items-center justify-center">
+                  {{ ic.icon('minus', 'w-3 h-3') }}
+                </button>
+                {% endif %}
+                <span class="text-xs font-extrabold text-ink min-w-3 text-center">{{ product.quantity }}</span>
+                <button type="button" onclick="cart.update('{{ product.cart_id }}', {{ product.quantity + 1 }});" title="{{ text_add_one|default('+') }}" class="w-5 h-5 rounded-full text-accent hover:bg-accent/10 flex items-center justify-center">
+                  {{ ic.icon('plus', 'w-3 h-3') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="cart.remove('{{ product.cart_id }}');" title="{{ button_remove }}" class="absolute top-3 right-3 text-ink-3 hover:text-danger p-1">
+          {{ ic.icon('trash', 'w-4 h-4') }}
+        </button>
+      </div>
+      {% endfor %}
+      {% for voucher in vouchers %}
+      <div class="cart-drawer-item">
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-surface/80 border border-border/40">
+          <span class="text-sm text-ink-2">{{ voucher.description }}</span>
+          <span class="font-headline font-bold text-sm text-primary">{{ voucher.amount }}</span>
+          <button type="button" onclick="voucher.remove('{{ voucher.key }}');" title="{{ button_remove }}" class="text-icon hover:text-danger p-1">{{ ic.icon('trash', 'w-4 h-4') }}</button>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="cart-drawer-summary mt-auto">
+        <div class="pt-4 border-t border-border/40 space-y-1.5">
+          {% for total in totals %}
+          <div class="flex items-center justify-between text-xs font-semibold text-ink-2">
+            <span>{{ total.title }}</span>
+            <span class="font-bold text-ink">{{ total.text }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <a href="{{ checkout }}" class="mt-3 flex items-center justify-center gap-2 py-3.5 rounded-full bg-accent hover:bg-primary text-white text-sm font-extrabold no-underline shadow-lg shadow-accent/25 transition-all">
+          {{ text_checkout }}
+        </a>
+        <a href="{{ cart }}" class="mt-2 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-ink-2 hover:text-primary no-underline">
+          {{ text_cart }}
+        </a>
+      </div>
+      {% else %}
+      <div class="flex flex-col items-center justify-center h-full text-center py-12">
+        <div class="w-16 h-16 rounded-full bg-surface-2 flex items-center justify-center text-icon mb-4">
+          {{ ic.icon('shopping-bag', 'w-8 h-8') }}
+        </div>
+        <h3 class="font-headline font-extrabold text-ink text-lg mb-1">{{ text_empty }}</h3>
+        <button type="button" onclick="$('#cart > button').dropdown('toggle'); return false;" class="mt-4 px-6 py-2.5 rounded-full bg-accent hover:bg-primary text-white text-xs font-bold transition-colors">
+          {{ text_continue|default('Continue Shopping') }}
+        </button>
+      </div>
+      {% endif %}
+    </li>
+
+  </ul>
+</div>

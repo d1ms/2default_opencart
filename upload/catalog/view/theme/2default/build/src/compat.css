@@ -1,0 +1,839 @@
+/*
+ * Bootstrap 3.4.1 compatibility + reskin layer.
+ *
+ * bootstrap.min.css is no longer loaded by 2default. Every template not yet
+ * hand-rewritten for 2default still uses Bootstrap 3 grid/component classes,
+ * and Bootstrap's JS (dropdown.js, collapse.js, tab.js, modal.js — still
+ * loaded) still toggles Bootstrap's state classes (.in, .open, .active).
+ * This file reimplements the classes those templates and that JS need,
+ * repainted in the 2default design tokens, so every page keeps working
+ * without being hand-rewritten.
+ *
+ * Grid breakpoints intentionally match Bootstrap 3 (768 / 992 / 1200), not
+ * Tailwind's defaults, since this grid stands in for Bootstrap's.
+ */
+
+/* ============ Grid ============ */
+
+.container, .container-fluid {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 15px;
+}
+.container { max-width: 100%; }
+@media (min-width: 768px)  { .container { max-width: 750px; } }
+@media (min-width: 992px)  { .container { max-width: 970px; } }
+@media (min-width: 1200px) { .container { max-width: 1170px; } }
+@media (min-width: 1440px) { .container { max-width: 1350px; } }
+
+.row, .row-flex {
+  display: flex;
+  flex-wrap: wrap;
+  margin-inline: -15px;
+}
+
+[class*=" col-"], [class^="col-"] {
+  box-sizing: border-box;
+  padding-inline: 15px;
+  width: 100%;
+}
+
+@media (min-width: 0) {
+  .col-xs-1  { flex: 0 0 8.3333%;  max-width: 8.3333%; }
+  .col-xs-2  { flex: 0 0 16.6667%; max-width: 16.6667%; }
+  .col-xs-3  { flex: 0 0 25%;      max-width: 25%; }
+  .col-xs-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-xs-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+  .col-xs-6  { flex: 0 0 50%;      max-width: 50%; }
+  .col-xs-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
+  .col-xs-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-xs-9  { flex: 0 0 75%;      max-width: 75%; }
+  .col-xs-10 { flex: 0 0 83.3333%; max-width: 83.3333%; }
+  .col-xs-11 { flex: 0 0 91.6667%; max-width: 91.6667%; }
+  .col-xs-12 { flex: 0 0 100%;     max-width: 100%; }
+  .col-xs-offset-1  { margin-left: 8.3333%; }
+  .col-xs-offset-2  { margin-left: 16.6667%; }
+  .col-xs-offset-3  { margin-left: 25%; }
+  .col-xs-offset-4  { margin-left: 33.3333%; }
+  .col-xs-offset-5  { margin-left: 41.6667%; }
+  .col-xs-offset-6  { margin-left: 50%; }
+  .col-xs-offset-8  { margin-left: 66.6667%; }
+}
+
+@media (min-width: 768px) {
+  .col-sm-1  { flex: 0 0 8.3333%;  max-width: 8.3333%; }
+  .col-sm-2  { flex: 0 0 16.6667%; max-width: 16.6667%; }
+  .col-sm-3  { flex: 0 0 25%;      max-width: 25%; }
+  .col-sm-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-sm-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+  .col-sm-6  { flex: 0 0 50%;      max-width: 50%; }
+  .col-sm-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
+  .col-sm-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-sm-9  { flex: 0 0 75%;      max-width: 75%; }
+  .col-sm-10 { flex: 0 0 83.3333%; max-width: 83.3333%; }
+  .col-sm-11 { flex: 0 0 91.6667%; max-width: 91.6667%; }
+  .col-sm-12 { flex: 0 0 100%;     max-width: 100%; }
+  .col-sm-offset-0 { margin-left: 0; }
+  .col-sm-offset-1 { margin-left: 8.3333%; }
+  .col-sm-offset-2 { margin-left: 16.6667%; }
+  .col-sm-offset-3 { margin-left: 25%; }
+  .col-sm-offset-4 { margin-left: 33.3333%; }
+}
+
+@media (min-width: 992px) {
+  .col-md-1  { flex: 0 0 8.3333%;  max-width: 8.3333%; }
+  .col-md-2  { flex: 0 0 16.6667%; max-width: 16.6667%; }
+  .col-md-3  { flex: 0 0 25%;      max-width: 25%; }
+  .col-md-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-md-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+  .col-md-6  { flex: 0 0 50%;      max-width: 50%; }
+  .col-md-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
+  .col-md-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-md-9  { flex: 0 0 75%;      max-width: 75%; }
+  .col-md-10 { flex: 0 0 83.3333%; max-width: 83.3333%; }
+  .col-md-11 { flex: 0 0 91.6667%; max-width: 91.6667%; }
+  .col-md-12 { flex: 0 0 100%;     max-width: 100%; }
+  .col-md-offset-3 { margin-left: 25%; }
+  .col-md-offset-8 { margin-left: 66.6667%; }
+}
+
+@media (min-width: 1200px) {
+  .col-lg-1  { flex: 0 0 8.3333%;  max-width: 8.3333%; }
+  .col-lg-2  { flex: 0 0 16.6667%; max-width: 16.6667%; }
+  .col-lg-3  { flex: 0 0 25%;      max-width: 25%; }
+  .col-lg-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-lg-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+  .col-lg-6  { flex: 0 0 50%;      max-width: 50%; }
+  .col-lg-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-lg-9  { flex: 0 0 75%;      max-width: 75%; }
+  .col-lg-12 { flex: 0 0 100%;     max-width: 100%; }
+}
+
+/* ============ Responsive visibility helpers ============ */
+
+@media (max-width: 767px)                      { .hidden-xs { display: none !important; } }
+@media (min-width: 768px) and (max-width: 991px) { .hidden-sm { display: none !important; } }
+@media (min-width: 992px) and (max-width: 1199px) { .hidden-md { display: none !important; } }
+@media (min-width: 1200px)                      { .hidden-lg { display: none !important; } }
+
+.visible-xs, .visible-sm, .visible-md, .visible-lg { display: none !important; }
+@media (max-width: 767px)                        { .visible-xs { display: block !important; } }
+@media (min-width: 768px) and (max-width: 991px)  { .visible-sm { display: block !important; } }
+@media (min-width: 992px) and (max-width: 1199px) { .visible-md { display: block !important; } }
+@media (min-width: 1200px)                        { .visible-lg { display: block !important; } }
+
+span.hidden-xs, span.hidden-sm, span.hidden-md, span.hidden-lg { display: inline; }
+
+/* ============ Bootstrap-JS state classes ============ */
+/* dropdown.js / collapse.js / tab.js / modal.js still ship and toggle these */
+
+/* Tailwind also ships a `.collapse` utility (visibility: collapse) whose name
+   collides with Bootstrap's. Reset visibility here so an opened panel is not
+   left as an empty box with invisible content. */
+.collapse       { display: none; visibility: visible; }
+.collapse.in    { display: block; }
+tr.collapse.in  { display: table-row; }
+tbody.collapse.in { display: table-row-group; }
+.collapsing     { position: relative; height: 0; overflow: hidden; transition: height 0.35s ease; }
+
+.dropup, .dropdown { position: relative; }
+.dropdown-toggle:focus { outline: 0; }
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  /* Bootstrap 3's own dropdown.less sets these; without them an element
+     with all offsets auto renders at its in-flow "static position" instead
+     of as a flyout below its trigger (visible on #nav-more-panel). */
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 250px;
+  padding: 10px;
+  margin: 2px 0 0;
+  list-style: none;
+  background-color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 20px rgba(19, 27, 46, 0.12);
+}
+.dropdown-menu.pull-right { right: 0; left: auto; }
+.dropdown-menu-right { right: 0; left: auto; }
+.open > .dropdown-menu { display: block; }
+.dropdown-menu > li > a,
+.dropdown-menu > li > button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+  white-space: nowrap;
+  background: none;
+  border: none;
+  border-radius: 0.5rem;
+}
+.dropdown-menu li > a:hover, .dropdown-menu li > button:hover {
+  text-decoration: none;
+  color: var(--color-primary);
+  background: var(--color-surface-2);
+}
+.caret {
+  display: inline-block;
+  width: 0; height: 0;
+  margin-left: 4px;
+  vertical-align: middle;
+  border-top: 4px solid;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.fade { opacity: 0; transition: opacity 0.15s linear; }
+.fade.in { opacity: 1; }
+
+/* ============ Tooltips (Bootstrap 3's tooltip.js, repainted) ============ */
+/*
+  tooltip.js builds this markup itself and appends it to <body> — it isn't
+  in any template. Without "position: absolute" here, the element sits at
+  the browser's static-positioning default, which makes tooltip.js's own
+  offset math (it reads the tooltip's current position to decide how far
+  to shift it) produce garbage coordinates, on top of it rendering
+  completely unstyled. Same category of fix as .dropdown-menu above.
+*/
+.tooltip {
+  position: absolute;
+  z-index: 1070;
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+.tooltip.in { opacity: 1; }
+.tooltip.top { padding: 7px 0; }
+.tooltip.right { padding: 0 7px; }
+.tooltip.bottom { padding: 7px 0; }
+.tooltip.left { padding: 0 7px; }
+.tooltip-inner {
+  max-width: 220px;
+  padding: 0.4rem 0.7rem;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  background-color: var(--color-ink-2);
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 16px rgba(19, 27, 46, 0.18);
+}
+.tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+.tooltip.top .tooltip-arrow,
+.tooltip.top-left .tooltip-arrow,
+.tooltip.top-right .tooltip-arrow {
+  bottom: 0;
+  border-width: 5px 5px 0;
+  border-top-color: var(--color-ink-2);
+}
+.tooltip.top .tooltip-arrow { left: 50%; margin-left: -5px; }
+.tooltip.top-left .tooltip-arrow { right: 5px; }
+.tooltip.top-right .tooltip-arrow { left: 5px; }
+.tooltip.right .tooltip-arrow {
+  top: 50%;
+  left: 0;
+  margin-top: -5px;
+  border-width: 5px 5px 5px 0;
+  border-right-color: var(--color-ink-2);
+}
+.tooltip.left .tooltip-arrow {
+  top: 50%;
+  right: 0;
+  margin-top: -5px;
+  border-width: 5px 0 5px 5px;
+  border-left-color: var(--color-ink-2);
+}
+.tooltip.bottom .tooltip-arrow,
+.tooltip.bottom-left .tooltip-arrow,
+.tooltip.bottom-right .tooltip-arrow {
+  top: 0;
+  border-width: 0 5px 5px;
+  border-bottom-color: var(--color-ink-2);
+}
+.tooltip.bottom .tooltip-arrow { left: 50%; margin-left: -5px; }
+.tooltip.bottom-left .tooltip-arrow { right: 5px; }
+.tooltip.bottom-right .tooltip-arrow { left: 5px; }
+
+.tab-content > .tab-pane { display: none; }
+.tab-content > .active { display: block; }
+.nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 15px;
+  padding: 0;
+  list-style: none;
+}
+.nav-tabs > li { margin-bottom: -1px; }
+.nav-tabs > li > a {
+  display: block;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
+  border: 1px solid transparent;
+  border-radius: 0.75rem 0.75rem 0 0;
+  text-decoration: none;
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: var(--color-primary);
+  background-color: #fff;
+  border-color: var(--color-border) var(--color-border) transparent;
+}
+.nav-tabs > li > a:hover { color: var(--color-primary); background: var(--color-surface-2); }
+
+.modal { position: fixed; inset: 0; z-index: 1050; display: none; overflow: hidden auto; }
+.modal.in { display: block; }
+.modal-open { overflow: hidden; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 1040; background: rgba(19, 27, 46, 0.6); }
+.modal-dialog { position: relative; width: auto; margin: 10vh auto; max-width: 600px; }
+.modal-content {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 60px rgba(19, 27, 46, 0.25);
+  padding: 1.5rem;
+}
+.modal-header { border-bottom: 1px solid var(--color-surface-2); padding-bottom: 0.75rem; margin-bottom: 0.75rem; }
+.modal-footer { border-top: 1px solid var(--color-surface-2); padding-top: 0.75rem; margin-top: 0.75rem; text-align: right; }
+
+/* ============ Buttons ============ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-headline);
+  line-height: 1.4;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn:hover { text-decoration: none; }
+.btn:focus, .btn:active, .btn:hover, select, button { outline: none !important; }
+.btn[disabled], .btn.disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-xs { padding: 0.3rem 0.55rem; font-size: 0.7rem; border-radius: 0.5rem; }
+.btn-sm { padding: 0.45rem 0.8rem; font-size: 0.75rem; border-radius: 0.6rem; }
+.btn-lg { padding: 0.85rem 1.5rem; font-size: 0.95rem; }
+.btn-block { display: flex; width: 100%; }
+
+.btn-primary  { color: #fff; background: var(--color-accent); border-color: var(--color-accent); }
+.btn-primary:hover, .btn-primary:active, .btn-primary.active { background: var(--color-primary); border-color: var(--color-primary); }
+.btn-default  { color: var(--color-ink-2); background: var(--color-surface-2); border-color: var(--color-border); }
+.btn-default:hover { color: var(--color-primary); background: var(--color-surface-3); }
+.btn-inverse  { color: #fff; background: var(--color-ink); border-color: var(--color-ink); }
+.btn-inverse:hover { background: #232d44; }
+.btn-danger   { color: #fff; background: var(--color-danger); border-color: var(--color-danger); }
+.btn-danger:hover { background: #9c1616; }
+.btn-info     { color: #fff; background: #2ba9c9; border-color: #2ba9c9; }
+.btn-success  { color: #fff; background: #10b981; border-color: #10b981; }
+.btn-warning  { color: #fff; background: #f59e0b; border-color: #f59e0b; }
+.btn-link     { color: var(--color-primary); background: none; border-color: transparent; padding: 0; }
+.btn-link:hover { text-decoration: underline; }
+.btn-outline-primary { color: var(--color-primary); background: transparent; border-color: var(--color-primary); }
+.btn-outline-primary:hover, .btn-outline-primary:active, .btn-outline-primary.active { color: #fff; background: var(--color-primary); border-color: var(--color-primary); }
+
+.btn-group { display: inline-flex; }
+.btn-group > .btn { border-radius: 0; margin-left: -1px; }
+.btn-group > .btn:first-child { border-radius: 0.75rem 0 0 0.75rem; margin-left: 0; }
+.btn-group > .btn:last-child { border-radius: 0 0.75rem 0.75rem 0; }
+.btn-group-sm > .btn { padding: 0.45rem 0.7rem; font-size: 0.75rem; }
+
+.btn-navbar {
+  color: #fff;
+  background: var(--color-primary);
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.6rem;
+}
+
+/* ============ Forms ============ */
+
+.form-group { margin-bottom: 1rem; }
+.form-horizontal .form-group { display: flex; flex-wrap: wrap; margin-inline: -15px; }
+.control-label {
+  font-weight: 600;
+  color: var(--color-ink);
+  padding-top: 0.55rem;
+  margin-bottom: 0.3rem;
+}
+div.required .control-label:before { content: '* '; color: var(--color-danger); font-weight: 700; }
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: 2.6rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: none;
+  transition: border-color 0.2s;
+}
+.form-control:not(textarea) { height: 2.6rem; }
+textarea.form-control { height: auto; min-height: 6rem; }
+.form-control:focus { outline: none; border-color: var(--color-primary); }
+.form-control::placeholder { color: var(--color-muted); }
+select.form-control { cursor: pointer; }
+
+.help-block { display: block; margin-top: 0.4rem; font-size: 0.75rem; color: var(--color-ink-3); }
+.help-block span { color: inherit !important; }
+.has-error .form-control { border-color: var(--color-danger); }
+.has-error .control-label, .has-error .help-block, .has-error .text-danger { color: var(--color-danger); }
+.text-danger { color: var(--color-danger); }
+
+.input-group { position: relative; display: flex; width: 100%; }
+.input-group .form-control { flex: 1 1 auto; width: 1%; }
+.input-group input, .input-group select, .input-group .dropdown-menu, .input-group .popover { font-size: 0.85rem; }
+.input-group-addon{
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+.input-group > .form-control:first-child,
+.input-group-addon:first-child { border-radius: 0.75rem 0 0 0.75rem; }
+.input-group > .form-control:last-child,
+.input-group-addon:last-child { border-radius: 0 0.75rem 0.75rem 0; }
+.input-group .form-control:not(:first-child):not(:last-child) { border-radius: 0; }
+.input-group-btn .btn { border-radius: 0; height: 100%; }
+.input-group-btn:last-child .btn { border-radius: 0 0.75rem 0.75rem 0; }
+.input-group .form-control[name^="quantity"] { min-width: 50px; }
+
+.checkbox, .radio { display: block; position: relative; padding-left: 1.6rem; margin: 0.5rem 0; font-weight: 400; }
+.checkbox input, .radio input { position: absolute; left: 0; top: 0.2rem; margin: 0; }
+.checkbox label, .radio label { display: flex; gap: 10px; font-weight: 400; cursor: pointer; align-items: baseline;}
+.checkbox-inline, .radio-inline { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: 1rem; font-weight: 400; }
+
+/* Custom checkbox/radio rendering, replacing the native control everywhere
+   except .option-pill-input (product-option swatches, which use a hidden
+   radio + their own pill styling and must keep accent-color sizing only). */
+input[type="checkbox"]:not(.option-pill-input),
+input[type="radio"]:not(.option-pill-input) {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  border: 1.5px solid var(--color-border);
+  border-radius: 0.3rem;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+input[type="radio"]:not(.option-pill-input) { border-radius: 50%; }
+
+input[type="checkbox"]:not(.option-pill-input):hover,
+input[type="radio"]:not(.option-pill-input):hover {
+  border-color: var(--color-primary);
+}
+
+input[type="checkbox"]:not(.option-pill-input):checked,
+input[type="radio"]:not(.option-pill-input):checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+input[type="checkbox"]:not(.option-pill-input):checked::after {
+  content: '';
+  position: absolute;
+  left: 0.36rem;
+  top: 0.14rem;
+  width: 0.3rem;
+  height: 0.55rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="radio"]:not(.option-pill-input):checked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: #fff;
+}
+
+input[type="checkbox"]:not(.option-pill-input):focus-visible,
+input[type="radio"]:not(.option-pill-input):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+input[type="checkbox"]:not(.option-pill-input):disabled,
+input[type="radio"]:not(.option-pill-input):disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* fieldset reset moved to @layer base in theme.css */
+
+/* ============ Alerts ============ */
+
+.alert {
+  position: relative;
+  padding: 0.85rem 2.2rem 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  font-size: 0.85rem;
+}
+.alert-success { color: #065f46; background: #ecfdf5; border-color: #a7f3d0; }
+.alert-info    { color: var(--color-primary); background: var(--color-surface-3); border-color: #b6c6ff; }
+.alert-warning { color: #92400e; background: #fffbeb; border-color: #fde68a; }
+.alert-danger  { color: #9c1616; background: #fef1f0; border-color: #f5c2c0; }
+.alert .close, .alert > .close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+.alert .close:hover { opacity: 1; }
+
+/* ============ Panels ============ */
+
+.panel { background: #fff; border: 1px solid var(--color-border); border-radius: 1rem; margin-bottom: 1.25rem; }
+.panel-default { border-color: var(--color-border); }
+.panel-heading {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--color-surface-2);
+  font-family: var(--font-headline);
+}
+.panel-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--color-ink); }
+.panel-body { padding: 1.25rem; }
+.panel-footer { padding: 0.9rem 1.25rem; border-top: 1px solid var(--color-surface-2); background: var(--color-surface); }
+.panel-group .panel { margin-bottom: 0.75rem; }
+
+/* ============ Tables ============ */
+
+.table { width: 100%; max-width: 100%; margin-bottom: 1.25rem; border-collapse: collapse; font-size: 0.85rem; }
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tbody > tr > td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  text-align: left;
+  border-top: 1px solid var(--color-surface-2);
+}
+.table > thead > tr > th {
+  border-bottom: 2px solid var(--color-border);
+  font-weight: 700;
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.table-bordered { border: 1px solid var(--color-border); }
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > td { border: 1px solid var(--color-surface-2); }
+.table-striped > tbody > tr:nth-of-type(odd) { background: var(--color-surface); }
+.table-hover > tbody > tr:hover { background: var(--color-surface-2); }
+.table-responsive { width: 100%; overflow-x: auto; }
+
+/* ============ Breadcrumb / Pagination ============ */
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-3);
+}
+.breadcrumb > li { display: flex; align-items: center; white-space: nowrap; }
+.breadcrumb > li a { color: var(--color-ink-3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb > li a:hover { color: var(--color-primary); }
+.breadcrumb > li:last-child a,
+.breadcrumb > li:last-child span { color: var(--color-primary); font-weight: 700; pointer-events: none; }
+.breadcrumb > li + li:before { content: '/'; padding: 0 0.35rem; color: var(--color-border); }
+
+.pagination {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pagination > li > a, .pagination > li > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  color: var(--color-ink-2);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.pagination > li > a:hover { background: var(--color-surface-2); color: var(--color-primary); }
+.pagination > .active > a, .pagination > .active > span { background: var(--color-primary); color: #fff; }
+.pagination > .disabled > a, .pagination > .disabled > span { opacity: 0.4; pointer-events: none; }
+
+/* ============ Nav / List group / Well ============ */
+
+.nav { list-style: none; margin: 0; padding: 0; }
+.nav > li { display: block; }
+.nav > li > a { display: block; padding: 0.6rem 0.9rem; text-decoration: none; color: var(--color-ink-2); }
+.list-inline { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.list-inline > li { display: inline-block; }
+.list-unstyled { list-style: none; margin: 0; padding: 0; }
+
+.list-group { display: flex; flex-direction: column; margin: 0 0 1.25rem; padding: 0; border-radius: 0.9rem; overflow: hidden; }
+.list-group-item,
+.list-group a {
+  display: block;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-top: none;
+  color: var(--color-ink-2);
+  text-decoration: none;
+  background: #fff;
+}
+.list-group-item:first-child, .list-group a:first-child { border-top: 1px solid var(--color-border); border-radius: 0.9rem 0.9rem 0 0; }
+.list-group-item:last-child, .list-group a:last-child { border-radius: 0 0 0.9rem 0.9rem; }
+.list-group-item.active, .list-group a.active,
+.list-group-item:hover, .list-group a:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-2);
+}
+
+.well {
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ============ Labels / Badges ============ */
+
+.label {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 0.4rem;
+  color: #fff;
+  background: var(--color-muted);
+}
+.label-info { background: var(--color-accent); }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  color: #fff;
+  background: var(--color-primary);
+}
+
+/* ============ Thumbnails / carousel (product gallery, swiper) ============ */
+#product-main-image {max-width: 90%; max-height: 400px;}
+.thumbnails { overflow: auto; clear: both; list-style: none; padding: 0; margin: -0.5rem; display: flex; flex-wrap: wrap; }
+.thumbnails > li { margin: 0.5rem; }
+.thumbnail { display: block; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--color-border); }
+.image-additional { max-width: 78px; }
+.image-additional a {
+  display: block;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+}
+.img-responsive { display: block; max-width: 100%; height: auto; }
+.img-thumbnail { padding: 4px; border: 1px solid var(--color-border); border-radius: 0.6rem; }
+
+.carousel { position: relative; }
+.carousel-caption { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+.carousel-control .icon-prev:before { content: '\2039'; font-size: 2rem; }
+.carousel-control .icon-next:before { content: '\203A'; font-size: 2rem; }
+
+/* The vendored swiper/css/opencart.css sets a white background + margin on
+   .swiper-viewport (its own "framed" look) — dropped in favor of a plain
+   transparent container that inherits whatever section it sits in. */
+.swiper-viewport { border: none !important; box-shadow: none !important; background: none !important; margin: 0 !important; }
+.swiper-viewport .swiper-container { border: 1px solid var(--color-border); border-radius: 0.75rem; background-clip: padding-box; }
+.swiper-viewport, .swiper-viewport img { border-radius: 0.75rem !important; }
+.swiper-container.swiper-container-horizontal { overflow: hidden; }
+.swiper-slide { display: flex; align-items: center; justify-content: center; }
+.swiper-pagination-bullet { background: var(--color-border) !important; box-shadow: none !important; opacity: 1; }
+.swiper-pagination-bullet-active { background: var(--color-primary) !important; }
+
+/* ============ Rating stars ============ */
+
+.rating .fa-stack { font-size: 8px; }
+.rating .fa-star-o { color: var(--color-border); font-size: 15px; }
+.rating .fa-star { color: #f5b400; font-size: 15px; }
+.rating .fa-star + .fa-star-o { color: #e69500; }
+
+/* ============ Helpers ============ */
+
+.pull-left  { float: left !important; }
+.pull-right { float: right !important; }
+.clearfix::after { content: ''; display: table; clear: both; }
+.text-left   { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right  { text-align: right !important; }
+.text-muted  { color: var(--color-ink-3) !important; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ============ Legacy structural IDs still referenced ============ */
+
+#content { min-height: 400px; }
+/* column_left/column_right (e.g. the "Рекомендуем почитать" /
+   featured_article block, when placed in a sidebar layout position
+   rather than content_bottom) is much narrower than the main content
+   column — .product-layout's col-lg-3/col-md-3/col-sm-6/col-xs-12 grid
+   is sized for a full-width row, so it needs full override here, not
+   just "width" (the sizing driver in a flex row is flex-basis/max-width,
+   which "width" alone doesn't touch). */
+#column-left .product-layout, #column-right .product-layout {
+  width: 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+/* Same problem, CSS Grid version: featured_article.twig's card grid uses
+   Tailwind's sm:/xl: prefixes, which respond to the *viewport* width, not
+   the (possibly sidebar-narrowed) parent column's width — 3 columns of a
+   ~330px sidebar squeezes each card to ~76px. */
+#column-left .article-card-grid, #column-right .article-card-grid,
+#column-left .product-card-grid, #column-right .product-card-grid {
+  grid-template-columns: 1fr;
+}
+.row-flex > div { display: flex; }
+.row-flex > div .caption { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; margin: 0; overflow: hidden; }
+.row-flex > div .caption p:not(.price) { margin: 0 0 auto; padding: 0 0 15px; }
+/*
+  No .sticky rule here: the word "sticky" is also a native Tailwind utility
+  (position: sticky), and this project's own templates use it (header,
+  product buy-box) with Tailwind's own top-* utilities. A same-named
+  unlayered rule here previously fought those utilities — see
+  common/header.twig and product/product.twig, which now use
+  static/lg:sticky/lg:top-* instead of relying on this class at all.
+*/
+
+/* Legacy product card, used by any module not yet migrated to product_thumb.twig */
+.product-thumb {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.65rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.product-thumb:hover { transform: translateY(-4px); box-shadow: 0px 12px 28px rgba(19, 27, 46, 0.08); }
+.product-thumb .image { text-align: center; background: var(--color-surface-2); border-radius: 0.75rem; overflow: hidden; margin-bottom: 0.75rem; padding: 1rem; }
+.product-thumb .image a { display: block; }
+.product-thumb .image img { margin-inline: auto; transition: transform 0.5s ease-out; }
+.product-thumb:hover .image img { transform: scale(1.05); }
+.product-thumb .caption { padding: 0 0.5rem 0.5rem; }
+.product-thumb .caption h4 { font-family: var(--font-headline); font-weight: 700; font-size: 1rem; margin: 0 0 0.2rem; }
+.product-thumb .caption h4 a { color: var(--color-ink); }
+.product-thumb .rating { padding-bottom: 0.5rem; }
+.product-thumb .price { margin: 0 0 0.5rem; color: var(--color-primary); font-family: var(--font-headline); font-size: 1.05rem; font-weight: 700; }
+.product-thumb .price-old { color: var(--color-muted); text-decoration: line-through; margin-left: 0.5rem; font-weight: 400; }
+.product-thumb .price-tax { color: var(--color-muted); font-weight: 400; font-size: 0.65em; display: block; margin: 5px 0 0; }
+.product-thumb .button-group { display: flex; gap: 0.5rem; }
+.product-thumb .button-group button {
+  flex: 1 1 auto;
+  border: none;
+  padding: 0.55rem 0.75rem;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+.product-thumb .button-group button:hover { background: var(--color-primary); }
+.product-thumb .button-group button + button { background: var(--color-surface-2); color: var(--color-ink-2); flex: 0 0 auto; }
+.product-thumb .button-group button + button:hover { color: var(--color-primary); background: var(--color-surface-3); }
+.product-layout:not(.product-list) .product-thumb { display: flex; flex-direction: column; height: 100%; }
+h2.price { margin: 0; }
+
+.product-page__price { margin: 20px 0 10px; }
+.product-page__qty-btn { display: flex; align-items: center; gap: 0.9rem; margin: 1.5rem 0; }
+.product-page__qty-btn input[name="quantity"] {
+  width: 3.5rem; height: 2.6rem; text-align: center;
+}
+
+/* Cookie notification (non-stock, kept from stock fork) */
+.cookie-notification {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--color-ink); color: #fff;
+  padding: 0.9rem 0; z-index: 9999;
+}
+.cookie-notification__container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
+.cookie-notification__info { padding: 0 1.5rem 0 0; font-size: 0.85rem; }
+.cookie-notification__info a { white-space: nowrap; color: #dbe1ff; }
+.cookie-notification__btn { height: fit-content; }
+@media (max-width: 767px) {
+  .cookie-notification__container { flex-wrap: wrap; }
+  .cookie-notification__info { flex: 1 1 100%; padding: 0 0 1rem; }
+}
+
+/* Account pages */
+#account-login #content > .row { display: flex; flex-wrap: wrap; }
+#account-login #content > .row .col-sm-6 { flex: 1 0 50%; margin-bottom: 1.25rem; }
+#account-login #content > .row .well { display: flex; flex-wrap: wrap; height: 100%; }
+#account-login #content > .row .well h2 { width: 100%; }
+#account-account .list-unstyled { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0 0 1.25rem; }
+#account-account .list-unstyled li {
+  padding: 0.6rem 1rem;
+  background: var(--color-surface-2);
+  border-radius: 0.75rem;
+}
+
+/* RTL */
+html[dir=rtl] .pull-left  { float: right !important; }
+html[dir=rtl] .pull-right { float: left !important; }
+html[dir=rtl] .breadcrumb > li + li:before { content: '\\'; }

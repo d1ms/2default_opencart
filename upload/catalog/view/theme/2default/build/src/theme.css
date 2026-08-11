@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+/* Twig templates and theme JS live outside Tailwind's default auto-scan root. */
+@source "../../template/**/*.twig";
+@source "../../js/**/*.js";
+@source "../../../../../admin/view/template/extension/theme/2default.twig";
+
+@theme {
+  /* Brand blue ramp */
+  --color-primary: #004ac6;
+  --color-primary-hover: #003ea8;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+
+  /* Surfaces */
+  --color-surface: #faf8ff;
+  --color-surface-2: #f2f3ff;
+  --color-surface-3: #eaedff;
+  --color-border: #c3c6d7;
+  --color-header-bg: rgba(250, 248, 255, 0.9);
+
+  /* Text */
+  --color-ink: #131b2e;
+  --color-ink-2: #434655;
+  --color-ink-3: #54647a;
+  --color-icon: #505f76;
+  --color-muted: #737686;
+
+  /* Semantic */
+  --color-danger: #ba1a1a;
+  --color-danger-soft: #ffdad6;
+
+  /* Dark ramp (hero / banner gradients) */
+  --color-dark-1: #131b2e;
+  --color-dark-2: #1e293b;
+  --color-dark-3: #0b1c30;
+
+  --color-slider-track: #dae2fd;
+  --color-hero-eyebrow: #b4c5ff;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-headline: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --container-app: 1280px;
+}
+
+@layer base {
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: local(''), url('../fonts/Inter-Regular.woff2') format('woff2'), url('../fonts/Inter-Regular.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: local(''), url('../fonts/Inter-Medium.woff2') format('woff2'), url('../fonts/Inter-Medium.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: local(''), url('../fonts/Inter-Bold.woff2') format('woff2'), url('../fonts/Inter-Bold.woff') format('woff');
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Nav category dropdowns near the right edge (common/menu.twig) stay
+       in normal flow while hidden (visibility:hidden, not display:none —
+       needed for the hover fade/lift transition) and can extend past the
+       viewport, inflating scrollWidth even though nothing is visible
+       there. Clip at the document level rather than the nav item itself,
+       since clipping there would also cut off the dropdown once it's
+       actually shown. */
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    width: 100%;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-headline {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  a {
+    color: var(--color-primary);
+  }
+  a:hover {
+    text-decoration: none;
+  }
+  a, a:focus, a:hover, a:visited {
+    outline: none !important;
+  }
+
+  label {
+    font-weight: 500;
+  }
+
+  fieldset {
+    min-width: 0;
+    margin: 0 0 1.5rem;
+    padding: 1.25rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-surface-2);
+    border-radius: 1rem;
+  }
+
+  legend {
+    display: block;
+    width: 100%;
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: var(--font-headline);
+    color: var(--color-ink);
+    padding: 0;
+    margin-bottom: 1rem;
+    border: none;
+  }
+}
+
+/* ---------- Demo-sourced custom utilities ---------- */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.blue-gradient {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+}
+
+.blue-gradient-hover:hover {
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, var(--color-primary-hover) 100%);
+}
+
+.card-hover-effect {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover-effect:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 12px 28px rgba(19, 27, 46, 0.08);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out;
+}
+
+/* Container used by every hand-written 2default template */
+@utility container-app {
+  width: 100%;
+  max-width: var(--container-app);
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= theme(--breakpoint-md)) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Custom scrollbars, matching the design source */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+@import "./compat.css";
+@import "./components.css";

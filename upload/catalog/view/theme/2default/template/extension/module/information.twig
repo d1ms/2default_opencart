@@ -1,0 +1,22 @@
+<div class="bg-white rounded-2xl border border-border/40 p-5 mb-6">
+  <h3 class="font-headline text-sm font-bold text-ink uppercase tracking-wide pb-3 mb-3 border-b border-border/40">{{ heading_title|default('Information') }}</h3>
+  <ul class="flex flex-col gap-0.5">
+    {% for information in informations %}
+    <li>
+      <a href="{{ information.href }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-3 hover:text-primary no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-medium">
+        {{ information.title }}
+      </a>
+    </li>
+    {% endfor %}
+    <li>
+      <a href="{{ contact }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-3 hover:text-primary no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-medium">
+        {{ text_contact }}
+      </a>
+    </li>
+    <li>
+      <a href="{{ sitemap }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-3 hover:text-primary no-underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary font-medium">
+        {{ text_sitemap }}
+      </a>
+    </li>
+  </ul>
+</div>
