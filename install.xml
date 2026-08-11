@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
-  <name>2default Theme</name>
+  <name>2default Free Opencart3 Theme</name>
   <code>2default</code>
   <version>1.0.0</version>
-  <author>2default</author>
-  <link>https://opencart3.test</link>
+  <author>d1medrol</author>
+  <link>https://t.me/d1medrol</link>
   <description>
     Core-file changes required by the 2default theme (cart AJAX quantity
     updates, the header cart-count badge, and a couple of missing language

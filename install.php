@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $this->load->model('user/user_group');
 
 $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/theme/2default');
@@ -10,6 +10,21 @@ $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify',
 $this->load->model('design/hero');
 $this->model_design_hero->install();
 
+// 1. Relocate account module to content_top in Account layouts
+$account_layouts = $this->db->query("SELECT DISTINCT `layout_id` FROM `" . DB_PREFIX . "layout_route` WHERE `route` LIKE 'account%'");
+
+foreach ($account_layouts->rows as $account_layout) {
+    $lid = (int)$account_layout['layout_id'];
+    $check_acc = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "layout_module` WHERE `layout_id` = '" . $lid . "' AND `code` = 'account'");
+
+    if ($check_acc->row['total'] > 0) {
+        $this->db->query("UPDATE `" . DB_PREFIX . "layout_module` SET `position` = 'content_top', `sort_order` = 0 WHERE `layout_id` = '" . $lid . "' AND `code` = 'account'");
+    } else {
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "layout_module` SET `layout_id` = '" . $lid . "', `code` = 'account', `position` = 'content_top', `sort_order` = 0");
+    }
+}
+
+// 2. Default Hero Promo Block
 $hero_query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "hero`");
 
 if ($hero_query->row['total'] == 0) {
@@ -69,4 +84,3 @@ if ($hero_query->row['total'] == 0) {
         $this->db->query("INSERT INTO `" . DB_PREFIX . "layout_module` SET `layout_id` = '" . (int)$layout_id . "', `code` = '" . $this->db->escape($module_code) . "', `position` = 'content_top', `sort_order` = 0");
     }
 }
-
