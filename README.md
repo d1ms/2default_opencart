@@ -3,6 +3,7 @@
 [![OpenCart Version](https://img.shields.io/badge/OpenCart-3.0%2B-blue.svg)](https://www.opencart.com/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)](LICENSE)
 [![Design](https://img.shields.io/badge/Design-Glassmorphism%20%26%20Tailwind-06b6d4.svg)](#features--возможности)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen.svg?style=for-the-badge)](demo/index.html)
 
 **[English](#english)** | **[Русский](#русский)**
 
